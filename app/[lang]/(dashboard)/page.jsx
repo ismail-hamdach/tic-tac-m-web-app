@@ -1,7 +1,14 @@
+"use client"
+
 import React from "react";
 
 const page = () => {
-  return <div className="text-2xl font-semibold">Start Your Content...</div>;
+  // Redirect to /[lang]/dashboard
+  React.useEffect(() => {
+    window.location.href = `/${window.location.pathname.split('/')[1]}/dashboard`;
+  }, []);
+  
+  return null;
 };
 
 export default page;

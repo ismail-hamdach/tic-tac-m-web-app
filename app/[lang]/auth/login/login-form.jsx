@@ -44,10 +44,10 @@ const LogInForm = () => {
   } = useForm({
     resolver: zodResolver(schema),
     mode: "all",
-    defaultValues: {
-      email: "dashtail@codeshaper.net",
-      password: "password",
-    },
+    // defaultValues: {
+    //   email: "dashtail@codeshaper.net",
+    //   password: "password",
+    // },
   });
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -77,9 +77,9 @@ const LogInForm = () => {
       <div className="2xl:mt-8 mt-6 2xl:text-3xl text-2xl font-bold text-default-900">
         TicTacM by DevSolCom 
       </div>
-      <div className="2xl:text-lg text-base text-default-600 mt-2 leading-6">
+      {/* <div className="2xl:text-lg text-base text-default-600 mt-2 leading-6">
         Enter the information you entered while registering.
-      </div>
+      </div> */}
       <form onSubmit={handleSubmit(onSubmit)} className="mt-5 2xl:mt-7">
         <div>
           <Label htmlFor="email" className="mb-2 font-medium text-default-600">
@@ -143,7 +143,7 @@ const LogInForm = () => {
           </div>
         )}
 
-        <div className="mt-5  mb-8 flex flex-wrap gap-2">
+        {/* <div className="mt-5  mb-8 flex flex-wrap gap-2">
           <div className="flex-1 flex  items-center gap-1.5 ">
             <Checkbox
               size="sm"
@@ -160,9 +160,9 @@ const LogInForm = () => {
           <Link href="/auth/forgot2" className="flex-none text-sm text-primary">
             Forget Password?
           </Link>
-        </div>
+        </div> */}
         <Button
-          className="w-full"
+          className="w-full mt-5"
           disabled={isPending}
           size={!isDesktop2xl ? "lg" : "md"}
         >
@@ -217,13 +217,13 @@ const LogInForm = () => {
           <Image src={twitter} alt="google" className="w-5 h-5" />
         </Button>
       </div> */}
-      <div className="mt-5 2xl:mt-8 text-center text-base text-default-600">
+      {/* <div className="mt-5 2xl:mt-8 text-center text-base text-default-600">
         Don't have an account?{" "}
         <Link href="/auth/register2" className="text-primary">
           {" "}
           Sign Up{" "}
         </Link>
-      </div>
+      </div> */}
     </div>
   );
 };

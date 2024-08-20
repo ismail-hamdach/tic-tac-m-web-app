@@ -40,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 
 
 import { users, columns } from "./data";
@@ -51,19 +52,55 @@ const FixedHeader = () => {
 
   useEffect(() => {
     const fetchEmployees = async () => {
+      setLoading(true); // Set loading to true before fetching
       try {
-        const response = await fetch('/api/employee'); // Adjust the API endpoint as needed
+        const response = await fetch('/api/employee');
         const data = await response.json();
         setEmployees(data);
       } catch (error) {
         console.error('Error fetching employees:', error);
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false after fetching
       }
     };
 
     fetchEmployees();
   }, []);
+
+  const onDelete = async (employee) => {
+    try {
+      const storedIpAddress = localStorage.getItem('ipAddress');
+      const storedPortNumber = localStorage.getItem('portNumber');
+
+      if (!storedIpAddress || !storedPortNumber)
+        toast({
+          title: "Configuration Required",
+          description: "Please go to configuration and configure your fingerprint scanner.",
+          color: "warning",
+        });
+      const response = await fetch('/api/employee/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: employee.user_id, ip_address: storedIpAddress, port: storedPortNumber }), // Send employee ID to delete
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete employee');
+      }
+      toast({
+        title: 'Employee deleted successfully!',
+        color: "success"
+      }); // Success toast
+      setEmployees((prevEmployees) =>
+        prevEmployees.filter(emp => emp.user_id !== employee.user_id) // Remove deleted employee from state
+      );
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      toast({ title: "Error", description: 'Error deleting employee: ' + error.message, color: "destructive" }); // Error toast
+    }
+  }
+
 
   return (
     <Table wrapperClass="h-[400px] overflow-auto custom-scrollbar">
@@ -103,7 +140,7 @@ const FixedHeader = () => {
               <TableCell>{`${formatDate(employee.created_at)} : ${formatTime(employee.created_at)}`}</TableCell>
               <TableCell className="flex justify-end">
                 <div className="flex gap-3">
-                  <EditingDialog employee={employee} />
+                  <EditingDialog employee={employee} setEmployees={setEmployees} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -130,7 +167,7 @@ const FixedHeader = () => {
                         <AlertDialogCancel className=" bg-secondary">
                           Cancel
                         </AlertDialogCancel>
-                        <AlertDialogAction className="bg-destructive hover:bg-destructive/80">
+                        <AlertDialogAction onClick={() => onDelete(employee)} className="bg-destructive hover:bg-destructive/80">
                           Ok
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -144,12 +181,49 @@ const FixedHeader = () => {
       </TableBody>
     </Table>
   );
-};
+}
 
 export default FixedHeader;
 
 
-const EditingDialog = ({ employee }) => {
+const EditingDialog = ({ employee, setEmployees }) => {
+  const [name, setName] = useState(employee.user_name);
+  const [phoneNumber, setPhoneNumber] = useState(employee.phone_number);
+  const [isLoading, setIsLoading] = useState(false); // Loading state for editing
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true); // Set loading to true during submission
+    try {
+      const response = await fetch('/api/employee/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: employee.user_id, name, phoneNumber }), // Send updated data
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update employee');
+      }
+      toast({
+        title: 'Employee updated successfully!'
+        , color: "success"
+      }); // Success toast
+
+      // Update the employee data in the list
+      setEmployees((prevEmployees) =>
+        prevEmployees.map((emp) =>
+          emp.user_id === employee.user_id ? { ...emp, user_name: name, phone_number: phoneNumber } : emp
+        )
+      );
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      toast({ title: "Error", description: 'Error updating employee: ' + error.message, color: "destructive" }); // Error toast
+    } finally {
+      setIsLoading(false); // Set loading to false after submission
+    }
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -165,36 +239,27 @@ const EditingDialog = ({ employee }) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Item</DialogTitle>
-          <form action="#" className=" space-y-5 pt-4">
+          <form action="#" className=" space-y-5 pt-4" onSubmit={handleSubmit}>
+            <div>
+              <Label className="mb-2">ID</Label>
+              <Input placeholder="id" disabled value={employee.user_id} />
+            </div>
             <div>
               <Label className="mb-2">Name</Label>
-              <Input placeholder="Name" value={employee.name} />
+              <Input
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
-            {/* end single */}
             <div>
-              <Label className="mb-2">Title</Label>
-              <Input placeholder="Title" value={employee.title} />
+              <Label className="mb-2">Phone Number</Label>
+              <Input
+                placeholder="Title"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
             </div>
-            {/* end single */}
-            <div>
-              <Label className="mb-2">Email</Label>
-              <Input placeholder="Email" type="email" value={employee.email} />
-            </div>
-            {/* end single */}
-            <div>
-              <Label className="mb-2">Email</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Role" value={employee.role} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">Admin</SelectItem>
-                  <SelectItem value="dark">Owner</SelectItem>
-                  <SelectItem value="system">Member</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {/* end single */}
             <div className="flex justify-end space-x-3">
               <DialogClose asChild>
                 <Button type="button" variant="outline" color="destructive">
@@ -202,7 +267,9 @@ const EditingDialog = ({ employee }) => {
                 </Button>
               </DialogClose>
               <DialogClose asChild>
-                <Button color="success">Save</Button>
+                <Button type="submit" color="success" disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save'}
+                </Button>
               </DialogClose>
             </div>
           </form>

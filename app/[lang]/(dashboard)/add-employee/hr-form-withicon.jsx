@@ -74,6 +74,7 @@ const hriFormWithIcon = () => {
         title: "Scan Fingerprint",
         description: "Please scan your fingerprint on the device.",
         duration: 9000,
+        color: "info"
       });
 
       // Step 2: Add user
