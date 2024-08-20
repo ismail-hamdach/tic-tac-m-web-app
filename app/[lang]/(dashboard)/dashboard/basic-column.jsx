@@ -10,24 +10,30 @@ import {
   getLabel,
 } from "@/lib/appex-chart-options";
 
-const BasicColumn = ({ height = 300 }) => {
+const BasicColumn = ({ height = 300, analyticsData }) => {
   const { theme: config, setTheme: setConfig, isRtl } = useThemeStore();
   const { theme: mode } = useTheme();
 
   const theme = themes.find((theme) => theme.name === config);
 
+  const months = analyticsData?.completedEmployeesLastNineMonths.map(item => item.month); // {{ edit_1 }}
+  const completedEmployees = analyticsData?.completedEmployeesLastNineMonths.map(item => item.completed_employees); // {{ edit_2 }}
+  const notCompletedEmployees = analyticsData?.notCompletedEmployeesLastNineMonths.map(item => item.not_completed_employees); // {{ edit_2 }}
+  const averageWorkingHours = analyticsData?.averageWorkingHoursLastNineMonths.map(item => item.average_hours); // {{ edit_2 }}
+
+
   const series = [
     {
       name: "Completed 8h",
-      data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+      data: completedEmployees,
     },
     {
       name: "Not Completed 8h",
-      data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
+      data: notCompletedEmployees,
     },
     {
       name: "Avg. Working Hours",
-      data: [35, 41, 36, 26, 45, 48, 52, 53, 41],
+      data: averageWorkingHours,
     },
   ];
 
@@ -67,17 +73,7 @@ const BasicColumn = ({ height = 300 }) => {
       },
     },
     xaxis: {
-      categories: [
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-      ],
+      categories: months,
       labels: getLabel(
         `hsl(${theme?.cssVars[
           mode === "dark" || mode === "system" ? "dark" : "light"
@@ -100,8 +96,8 @@ const BasicColumn = ({ height = 300 }) => {
     legend: {
       labels: {
         colors: `hsl(${theme?.cssVars[
-            mode === "dark" || mode === "system" ? "dark" : "light"
-          ].chartLabel
+          mode === "dark" || mode === "system" ? "dark" : "light"
+        ].chartLabel
           })`,
       },
       itemMargin: {

@@ -14,7 +14,7 @@ const layout = async ({ children, params: { lang } }) => {
   const trans = await getDictionary(lang);
 
   return (
-    <DashBoardLayoutProvider trans={trans}>{children}</DashBoardLayoutProvider>
+    <DashBoardLayoutProvider trans={trans} >{children}</DashBoardLayoutProvider>
   );
 };
 

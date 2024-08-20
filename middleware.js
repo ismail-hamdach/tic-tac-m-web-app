@@ -3,7 +3,7 @@ import { match } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
 
 let defaultLocale = "en";
-let locales = ["bn", "en", "ar"];
+let locales = ["fr", "en", "ar"];
 
 // Get the preferred locale, similar to above or using a library
 function getLocale(request) {

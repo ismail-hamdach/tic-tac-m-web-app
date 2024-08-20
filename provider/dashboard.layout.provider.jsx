@@ -46,6 +46,7 @@ const DashBoardLayoutProvider = ({ children, trans }) => {
                 setOpen={setOpen}
                 open={open}
                 location={location}
+                trans={trans}
               >
                 {children}
               </LayoutWrapper>
@@ -73,6 +74,7 @@ const DashBoardLayoutProvider = ({ children, trans }) => {
               setOpen={setOpen}
               open={open}
               location={location}
+              trans={trans}
             >
               {children}
             </LayoutWrapper>
@@ -106,6 +108,7 @@ const DashBoardLayoutProvider = ({ children, trans }) => {
               setOpen={setOpen}
               open={open}
               location={location}
+              trans={trans}
             >
               {children}
             </LayoutWrapper>
@@ -137,6 +140,7 @@ const DashBoardLayoutProvider = ({ children, trans }) => {
             setOpen={setOpen}
             open={open}
             location={location}
+            trans={trans}
           >
             {children}
           </LayoutWrapper>
@@ -149,7 +153,7 @@ const DashBoardLayoutProvider = ({ children, trans }) => {
 
 export default DashBoardLayoutProvider;
 
-const LayoutWrapper = ({ children, isMobile, setOpen, open, location }) => {
+const LayoutWrapper = ({ children, isMobile, setOpen, open, location, trans }) => {
   return (
     <>
       <motion.div
