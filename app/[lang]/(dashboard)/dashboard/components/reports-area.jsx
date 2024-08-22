@@ -27,10 +27,6 @@ const ReportsArea = ({ analyticsData }) => {
         const { employeesCompletedHours,
           employeesNotCompletedHours,
           averageHours } = data
-        console.log(data)
-        console.log(employeesCompletedHours)
-        console.log(employeesNotCompletedHours)
-        console.log(averageHours)
         setEmployeesCompletedHours(employeesCompletedHours)
         setEmployeesNotCompletedHours(employeesNotCompletedHours)
         setEmployeesAvgHoursLastWeek(averageHours)
@@ -105,7 +101,7 @@ const ReportsArea = ({ analyticsData }) => {
       id: 3,
       name: "Avg. Working Hours",
       hasRate: false,
-      count: Number(analyticsData?.averageHoursLastWeek.average_hours).toFixed(2) + "h",
+      count: Number(analyticsData?.averageHoursLastWeek.average_hours || 0).toFixed(2) + "h" ,
       rate: analyticsData?.averageHoursLastWeek.average_hours / analyticsData?.averageHoursLastTwoWeeks.average_hours,
       isUp: analyticsData?.averageHoursLastWeek.average_hours > analyticsData?.averageHoursLastTwoWeeks.average_hours,
       icon: <Application className="h-4 w-4" />,
@@ -114,7 +110,7 @@ const ReportsArea = ({ analyticsData }) => {
     {
       id: 4,
       name: "Number of Employees Completed 8H",
-      count: analyticsData?.completedNotCompleted.completed,
+      count: analyticsData?.completedNotCompleted.completed || 0,
       hasRate: false,
       rate: "30",
       isUp: false,
@@ -124,7 +120,7 @@ const ReportsArea = ({ analyticsData }) => {
     {
       id: 5,
       name: "Number of Employees Not Completed 8H",
-      count: analyticsData?.completedNotCompleted.not_completed,
+      count: analyticsData?.completedNotCompleted.not_completed || 0,
       hasRate: false,
       rate: "30",
       isUp: false,
@@ -134,7 +130,7 @@ const ReportsArea = ({ analyticsData }) => {
     {
       id: 6,
       name: "Total Employees",
-      count: analyticsData?.totalEmployees.total_employees,
+      count: analyticsData?.totalEmployees.total_employees || 0,
       hasRate: false,
       rate: "30",
       isUp: true,

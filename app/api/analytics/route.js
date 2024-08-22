@@ -9,6 +9,8 @@ const dbConfig = {
   database: process.env.DB_NAME,
 };
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   let connection;
   try {

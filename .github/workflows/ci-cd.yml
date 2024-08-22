@@ -1,0 +1,190 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm ci 
+
+    - name: Run Linting
+      run: npm run lint
+
+    - name: Run Tests
+      run: npm run test
+
+    - name: Build the application
+      run: npm run build > .log
+
+    - name: Notify Slack - Build Success
+      if: success()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "channel": "#your-slack-channel",
+            "username": "GitHub Actions",
+            "text": ":white_check_mark: Build succeeded for ${{ github.repository }} on commit ${{ github.sha }}.",
+            "icon_emoji": ":rocket:"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Capture Logs on Build Failure
+      if: failure()
+      id: capture-logs
+      run: |
+        echo "Log Output: " > logs.txt
+        echo "=============== Start Logs ===============" >> logs.txt
+        cat $GITHUB_WORKSPACE/*.log >> logs.txt || echo "No logs found." >> logs.txt
+        echo "=============== End Logs ===============" >> logs.txt
+        cat logs.txt
+
+    - name: Notify Slack - Build Failure with Logs
+      if: failure()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "channel": "#your-slack-channel",
+            "username": "GitHub Actions",
+            "text": ":x: Build failed for ${{ github.repository }} on commit ${{ github.sha }}. Here are the logs:\n```$(cat logs.txt | tail -n 50)```",
+            "icon_emoji": ":warning:"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  docker_build:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/nextjs-app:${{ github.sha }} .
+
+    - name: Push Docker image to Docker Hub
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/nextjs-app:${{ github.sha }}
+
+    - name: Notify Slack - Docker Build Success
+      if: success()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "channel": "#your-slack-channel",
+            "username": "GitHub Actions",
+            "text": ":white_check_mark: Docker build and push succeeded for ${{ github.repository }}.",
+            "icon_emoji": ":whale:"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Capture Logs on Docker Build Failure
+      if: failure()
+      id: capture-logs
+      run: |
+        echo "Log Output: " > logs.txt
+        echo "=============== Start Logs ===============" >> logs.txt
+        cat $GITHUB_WORKSPACE/*.log >> logs.txt || echo "No logs found." >> logs.txt
+        echo "=============== End Logs ===============" >> logs.txt
+        cat logs.txt
+
+    - name: Notify Slack - Docker Build Failure with Logs
+      if: failure()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "channel": "#your-slack-channel",
+            "username": "GitHub Actions",
+            "text": ":x: Docker build or push failed for ${{ github.repository }}. Here are the logs:\n```$(cat logs.txt | tail -n 50)```",
+            "icon_emoji": ":warning:"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  deploy:
+    needs: docker_build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: SSH into the server
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/nextjs-app:${{ github.sha }}
+          docker stop nextjs-app || true
+          docker rm nextjs-app || true
+          docker run -d -p 3000:3000 --name nextjs-app ${{ secrets.DOCKER_USERNAME }}/nextjs-app:${{ github.sha }}
+
+    - name: Notify Slack - Deployment Success
+      if: success()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "channel": "#your-slack-channel",
+            "username": "GitHub Actions",
+            "text": ":white_check_mark: Deployment succeeded for ${{ github.repository }}.",
+            "icon_emoji": ":rocket:"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Capture Logs on Deployment Failure
+      if: failure()
+      id: capture-logs
+      run: |
+        echo "Log Output: " > logs.txt
+        echo "=============== Start Logs ===============" >> logs.txt
+        cat $GITHUB_WORKSPACE/*.log >> logs.txt || echo "No logs found." >> logs.txt
+        echo "=============== End Logs ===============" >> logs.txt
+        cat logs.txt
+
+    - name: Notify Slack - Deployment Failure with Logs
+      if: failure()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "channel": "#your-slack-channel",
+            "username": "GitHub Actions",
+            "text": ":x: Deployment failed for ${{ github.repository }}. Here are the logs:\n```$(cat logs.txt | tail -n 50)```",
+            "icon_emoji": ":warning:"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

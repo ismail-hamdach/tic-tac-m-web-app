@@ -28,7 +28,7 @@ const AvatarGroup = React.forwardRef(
         )}
         {...props}
       >
-        {avatars.slice(0, max).map((avatar, index) => (
+        {avatars?.slice(0, max).map((avatar, index) => (
           <React.Fragment key={index}>{avatar}</React.Fragment>
         ))}
         {avatars.length > max && (
