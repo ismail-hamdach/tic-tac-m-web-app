@@ -92,9 +92,9 @@ const Breadcrumbs = React.forwardRef(
         totalItems - visibleBefore
       );
       visibleItems = [
-        ...breadcrumbItems.slice(0, visibleBefore),
+        ...breadcrumbItems?.slice(0, visibleBefore),
         null, // Placeholder for ellipsis
-        ...breadcrumbItems.slice(totalItems - visibleAfter),
+        ...breadcrumbItems?.slice(totalItems - visibleAfter),
       ];
     }
 

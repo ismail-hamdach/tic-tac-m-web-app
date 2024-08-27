@@ -6,6 +6,9 @@ const dbConfig = {
     database: process.env.DB_NAME,
 };
 // New endpoint to retrieve employees who completed 8 hours yesterday
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(req) {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
