@@ -25,8 +25,8 @@ export async function GET() {
     // Get yesterday's date
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const startOfDay = new Date(yesterday.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(yesterday.setHours(23, 59, 59, 999));
+    const startOfDay = new Date(yesterday.setHours(6, 30, 0, 0));
+    const endOfDay = new Date(yesterday.setHours(6, 29, 59, 999));
 
 
     // Execute the query to count employees who completed and did not complete 8 hours

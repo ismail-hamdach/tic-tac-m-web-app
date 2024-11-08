@@ -16,11 +16,17 @@ const BasicColumn = ({ height = 300, analyticsData }) => {
 
   const theme = themes.find((theme) => theme.name === config);
 
-  const months = analyticsData?.completedEmployeesLastNineMonths.map(item => item.month); // {{ edit_1 }}
-  const completedEmployees = analyticsData?.completedEmployeesLastNineMonths.map(item => item.completed_employees); // {{ edit_2 }}
-  const notCompletedEmployees = analyticsData?.notCompletedEmployeesLastNineMonths.map(item => item.not_completed_employees); // {{ edit_2 }}
-  const averageWorkingHours = analyticsData?.averageWorkingHoursLastNineMonths.map(item => item.average_hours); // {{ edit_2 }}
+  const completedEmployees = analyticsData?.completedEmployeesLastNineMonths.map(item => item.completed_employees) || []; // {{ edit_2 }}
+  const notCompletedEmployees = analyticsData?.notCompletedEmployeesLastNineMonths.map(item => item.not_completed_employees) || []; // {{ edit_2 }}
+  const averageWorkingHours = analyticsData?.averageWorkingHoursLastNineMonths.map(item => item.average_hours) || []; // {{ edit_2 }}
 
+  const maxLength = Math.max(completedEmployees.length, notCompletedEmployees.length, averageWorkingHours.length); // {{ edit_3 }}
+
+  const months = (completedEmployees.length === maxLength ? 
+    analyticsData?.completedEmployeesLastNineMonths.map(item => item.month) : 
+    notCompletedEmployees.length === maxLength ? 
+    analyticsData?.notCompletedEmployeesLastNineMonths.map(item => item.month) : 
+    analyticsData?.averageWorkingHoursLastNineMonths.map(item => item.month)) || []; // {{ edit_1 }}
 
   const series = [
     {

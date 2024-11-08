@@ -42,7 +42,7 @@ export async function POST(request) {
         const addUserResponse = await fetch(`${process.env.NEXT_PUBLIC_ZK_API_URL}/add_user`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_name: userName }),
+            body: JSON.stringify({ user_name: userName, ip_address, port }),
         });
 
         if (!addUserResponse.ok) {

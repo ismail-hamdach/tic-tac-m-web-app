@@ -61,7 +61,7 @@ const ProfileInfo = () => {
             {
               name: "profile",
               icon: "heroicons:user",
-              href: "/user-profile",
+              href: "/profile",
             },
             // {
             //   name: "Billing",
@@ -71,7 +71,7 @@ const ProfileInfo = () => {
             {
               name: "Settings",
               icon: "carbon:settings",
-              href: "/settings",
+              href: "/configuration",
             },
             // {
             //   name: "Keyboard shortcuts",
