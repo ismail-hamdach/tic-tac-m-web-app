@@ -1,0 +1,5 @@
+npm uninstall @ckeditor/ckeditor5-build-classic @ckeditor/ckeditor5-react @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities @emoji-mart/data @emoji-mart/react @fullcalendar/core @fullcalendar/daygrid @fullcalendar/interaction @fullcalendar/list @fullcalendar/react @fullcalendar/timegrid @hookform/resolvers @mdx-js/loader @mdx-js/react @next/mdx @react-email/components @south-paw/react-vector-maps @tanstack/react-query-devtools @tanstack/react-table @types/mdx @unovis/react @unovis/ts @vercel/analytics apexcharts chart.js d3-shape dagre dayjs embla-carousel-auto-height embla-carousel-autoplay embla-carousel-wheel-gestures emoji-mart eslint eslint-config-next google-map-react html-to-image leaflet lucide moment postcss quill rc-tree react-apexcharts react-chartjs-2 react-dnd react-dnd-html5-backend react-dropzone react-email react-leaflet react-quilljs react-select react-shepherd react-wrap-balancer reactflow recharts styled-components swiper tailwindcss unist-util-visit zod
+
+npm cache clean --force
+
+npm install

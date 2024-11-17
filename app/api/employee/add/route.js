@@ -3,10 +3,10 @@ import mysql from 'mysql2/promise';
 
 // MySQL connection configuration
 const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: process.env.NEXT_DB_HOST,
+    user: process.env.NEXT_DB_USER,
+    password: process.env.NEXT_DB_PASSWORD,
+    database: process.env.NEXT_DB_NAME,
 };
 
 export async function POST(request) {
@@ -42,7 +42,11 @@ export async function POST(request) {
         const addUserResponse = await fetch(`${process.env.NEXT_PUBLIC_ZK_API_URL}/add_user`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_name: userName }),
+            body: JSON.stringify({
+                user_name: userName, 
+                ip_address, 
+                port
+            }),
         });
 
         if (!addUserResponse.ok) {
