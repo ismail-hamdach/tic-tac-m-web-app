@@ -12,6 +12,10 @@ export const columns = [
     label: "phone number",
   },
   {
+    key: "department",
+    label: "Department",
+  },
+  {
     key: "created at",
     label: "Created at",
   },

@@ -43,8 +43,8 @@ export async function POST(request) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                user_name: userName, 
-                ip_address, 
+                user_name: userName,
+                ip_address,
                 port
             }),
         });
@@ -61,9 +61,28 @@ export async function POST(request) {
             'INSERT INTO employees (user_id, user_name, phone_number, privilege) VALUES (?, ?, ?, ?)',
             [addUserResult.data.user_id, userName, phoneNumber, addUserResult.data.privilege]
         );
+
+        const [rows] = await connection.execute(`
+            SELECT
+                e.index,
+                e.user_id,
+                e.user_name,
+                e.phone_number,
+                e.created_at,
+                e.departement_id,
+                d.department_name
+            FROM
+                employees e
+            LEFT JOIN departments d ON
+                e.departement_id = d.id 
+            WHERE user_id = ?
+            `,
+            [addUserResult.data.user_id]
+        );
+
         await connection.end();
 
-        return NextResponse.json({ message: 'User added successfully' }, { status: 201 });
+        return NextResponse.json({ message: 'User added successfully', user: rows[0] }, { status: 201 });
     } catch (error) {
         console.error('Error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

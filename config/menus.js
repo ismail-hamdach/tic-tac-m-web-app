@@ -1,6 +1,6 @@
-import { DashBoard } from "@/components/svg";
+import { DashBoard, Medical } from "@/components/svg";
 // Import the Employee icon (assuming it exists)
-import { UserSign } from "@/components/svg";
+import { UserSign, Grid } from "@/components/svg";
 import { User, Settings } from "@/components/svg";
 
 export const menusConfig = {
@@ -12,14 +12,19 @@ export const menusConfig = {
     },
     // Add Employee to mainNav
     {
-      title: "Add Employee",
+      title: "Employees",
       icon: UserSign,
       href: "/add-employee",
     },
     {
-      title: "List of Employees",
+      title: "Departments",
       icon: User,
-      href: "/list-employee",
+      href: "/departments",
+    },
+    {
+      title: "Shifts",
+      icon: Medical,
+      href: "/shifts",
     },
     {
       title: "Configuration",
@@ -27,6 +32,7 @@ export const menusConfig = {
       href: "/configuration",
     },
   ],
+  // Official sidebar
   sidebarNav: {
     modern: [
       {
@@ -36,14 +42,19 @@ export const menusConfig = {
       },
       // Add Employee to mainNav
       {
-        title: "Add Employee",
-        icon: UserSign,
+        title: "Employees",
+        icon: User,
         href: "/add-employee",
       },
       {
-        title: "List of Employees",
-        icon: User,
-        href: "/list-employee",
+        title: "Departments",
+        icon: Grid,
+        href: "/departments",
+      },
+      {
+        title: "Shifts",
+        icon: Medical,
+        href: "/shifts",
       },
       {
         title: "Configuration",
@@ -63,14 +74,19 @@ export const menusConfig = {
       },
       // Add Employee to mainNav
       {
-        title: "Add Employee",
-        icon: UserSign,
+        title: "Employees",
+        icon: User,
         href: "/add-employee",
       },
       {
-        title: "List of Employees",
-        icon: User,
-        href: "/list-employee",
+        title: "Departments",
+        icon: Grid,
+        href: "/departments",
+      },
+      {
+        title: "Shifts",
+        icon: Medical,
+        href: "/shifts",
       },
       {
         title: "Configuration",

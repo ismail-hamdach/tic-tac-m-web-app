@@ -46,58 +46,48 @@ import { toast } from "@/components/ui/use-toast";
 import { users, columns } from "./data";
 import { formatDate, formatTime } from "@/lib/utils";
 
-const FixedHeader = () => {
-  const [employees, setEmployees] = useState([]);
+const FixedHeader = ({departments, setDepartments}) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchDepartments = async () => {
       setLoading(true); // Set loading to true before fetching
       try {
-        const response = await fetch('/api/employee');
+        const response = await fetch('/api/departements');
         const data = await response.json();
-        setEmployees(data);
+        setDepartments(data);
       } catch (error) {
-        console.error('Error fetching employees:', error);
+        console.error('Error fetching departement:', error);
       } finally {
         setLoading(false); // Set loading to false after fetching
       }
     };
 
-    fetchEmployees();
+    fetchDepartments();
   }, []);
 
-  const onDelete = async (employee) => {
+  const onDelete = async (department) => {
     try {
-      const storedIpAddress = localStorage.getItem('ipAddress');
-      const storedPortNumber = localStorage.getItem('portNumber');
-
-      if (!storedIpAddress || !storedPortNumber)
-        toast({
-          title: "Configuration Required",
-          description: "Please go to configuration and configure your fingerprint scanner.",
-          color: "warning",
-        });
-      const response = await fetch('/api/employee/delete', {
-        method: 'POST',
+      const response = await fetch('/api/departements', {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: employee.user_id, ip_address: storedIpAddress, port: storedPortNumber }), // Send employee ID to delete
+        body: JSON.stringify({ id: department.id}), // Send employee ID to delete
       });
       if (!response.ok) {
-        throw new Error('Failed to delete employee');
+        throw new Error('Failed to delete department');
       }
       toast({
-        title: 'Employee deleted successfully!',
+        title: 'department deleted successfully!',
         color: "success"
       }); // Success toast
-      setEmployees((prevEmployees) =>
-        prevEmployees.filter(emp => emp.user_id !== employee.user_id) // Remove deleted employee from state
+      setDepartments((prevDepartment) =>
+        prevDepartment.filter(dept => dept.id !== department.id) // Remove deleted employee from state
       );
     } catch (error) {
-      console.error('Error deleting employee:', error);
-      toast({ title: "Error", description: 'Error deleting employee: ' + error.message, color: "destructive" }); // Error toast
+      console.error('Error deleting department:', error);
+      toast({ title: "Error", description: 'Error deleting department: ' + error.message, color: "destructive" }); // Error toast
     }
   }
 
@@ -122,7 +112,7 @@ const FixedHeader = () => {
               <Icon icon="eos-icons:loading" className="w-8 h-8 animate-spin mx-auto" />
             </TableCell>
           </TableRow>
-        ) : employees.length === 0 ? (
+        ) : departments.length === 0 ? (
           <TableRow>
             <TableCell colSpan={columns.length} className="text-center py-8">
               <div className="flex flex-col items-center">
@@ -132,15 +122,15 @@ const FixedHeader = () => {
             </TableCell>
           </TableRow>
         ) : (
-          employees.map((employee) => (
-            <TableRow key={employee.id} className="hover:bg-slate-400 hover:bg-opacity-20 hover:cursor-pointer animate-slideDownAndFade">
-              <TableCell>{employee.user_id}</TableCell>
-              <TableCell>{employee.user_name}</TableCell>
-              <TableCell>{employee.phone_number}</TableCell>
-              <TableCell>{`${formatDate(employee.created_at)} : ${formatTime(employee.created_at)}`}</TableCell>
+          departments.map((department) => (
+            <TableRow key={department.id} className="hover:bg-slate-400 hover:bg-opacity-20 hover:cursor-pointer animate-slideDownAndFade">
+
+              <TableCell>{department.id}</TableCell>
+              <TableCell>{department.department_name}</TableCell>
+              <TableCell>{`${formatDate(department.created_at)} : ${formatTime(department.created_at)}`}</TableCell>
               <TableCell className="flex justify-end">
                 <div className="flex gap-3">
-                  <EditingDialog employee={employee} setEmployees={setEmployees} />
+                  <EditingDialog department={department} setDepartments={setDepartments} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -167,7 +157,7 @@ const FixedHeader = () => {
                         <AlertDialogCancel className=" bg-secondary">
                           Cancel
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={() => onDelete(employee)} className="bg-destructive hover:bg-destructive/80">
+                        <AlertDialogAction onClick={() => onDelete(department)} className="bg-destructive hover:bg-destructive/80">
                           Ok
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -186,41 +176,42 @@ const FixedHeader = () => {
 export default FixedHeader;
 
 
-const EditingDialog = ({ employee, setEmployees }) => {
-  const [name, setName] = useState(employee.user_name);
-  const [phoneNumber, setPhoneNumber] = useState(employee.phone_number);
-  const [isLoading, setIsLoading] = useState(false); // Loading state for editing
+const EditingDialog = ({ department, setDepartments }) => {
+
+  const [departementName, setDepartementName] = useState(department.department_name);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading to true during submission
+    setIsLoading(true);
+    
     try {
-      const response = await fetch('/api/employee/update', {
-        method: 'POST',
+      const response = await fetch('/api/departements', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: employee.user_id, name, phoneNumber }), // Send updated data
+        body: JSON.stringify({ id: department.id, departementName }),
       });
       if (!response.ok) {
-        throw new Error('Failed to update employee');
+        throw new Error('Failed to update department');
       }
       toast({
-        title: 'Employee updated successfully!'
+        title: 'Department updated successfully!'
         , color: "success"
       }); // Success toast
 
       // Update the employee data in the list
-      setEmployees((prevEmployees) =>
-        prevEmployees.map((emp) =>
-          emp.user_id === employee.user_id ? { ...emp, user_name: name, phone_number: phoneNumber } : emp
+      setDepartments((prevDepartment) =>
+        prevDepartment.map((dept) =>
+          dept.id === department.id ? { ...dept, department_name: departementName } : dept
         )
       );
     } catch (error) {
-      console.error('Error updating employee:', error);
-      toast({ title: "Error", description: 'Error updating employee: ' + error.message, color: "destructive" }); // Error toast
+      console.error('Error updating department:', error);
+      toast({ title: "Error", description: 'Error updating department: ' + error.message, color: "destructive" }); // Error toast
     } finally {
-      setIsLoading(false); // Set loading to false after submission
+      setIsLoading(false);
     }
   };
 
@@ -238,28 +229,23 @@ const EditingDialog = ({ employee, setEmployees }) => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Item</DialogTitle>
+          <DialogTitle>Edit Department</DialogTitle>
+
           <form action="#" className=" space-y-5 pt-4" onSubmit={handleSubmit}>
             <div>
               <Label className="mb-2">ID</Label>
-              <Input placeholder="id" disabled value={employee.user_id} />
+              <Input placeholder="id" disabled value={department.id} />
             </div>
             <div>
               <Label className="mb-2">Name</Label>
               <Input
                 placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={departementName}
+                onChange={(e) => setDepartementName(e.target.value)}
               />
             </div>
-            <div>
-              <Label className="mb-2">Phone Number</Label>
-              <Input
-                placeholder="Title"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </div>
+            
+            
             <div className="flex justify-end space-x-3">
               <DialogClose asChild>
                 <Button type="button" variant="outline" color="destructive">

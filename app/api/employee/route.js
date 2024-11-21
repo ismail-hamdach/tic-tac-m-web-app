@@ -14,8 +14,21 @@ export async function GET() {
       database: process.env.NEXT_DB_NAME,
     });
 
-    // Execute the query to fetch all users
-    const [rows] = await connection.execute('SELECT * FROM employees');
+    // Execute the query to fetch all users with their departments
+    const [rows] = await connection.execute(`
+        SELECT
+            e.index,
+            e.user_id,
+            e.user_name,
+            e.phone_number,
+            e.created_at,
+            e.departement_id,
+            d.department_name
+        FROM
+            employees e
+        LEFT JOIN departments d ON
+            e.departement_id = d.id;
+    `);
 
     // Close the database connection
     await connection.end();

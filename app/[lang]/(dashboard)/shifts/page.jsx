@@ -7,15 +7,16 @@ import FixedHeader from "./components/fixed-header";
 
 
 const page = () => {
-  const [employees, setEmployees] = useState([])
+  const [shifts, setShifts] = useState([])
+
   return <div className="text-2xl font-semibold pt-8 flex flex-col gap-4">
 
-    <Card title="Add Employee">
-      <HrFormWithIcon employees={employees} setEmployees={setEmployees} />
+    <Card title="Add Shifts">
+      <HrFormWithIcon shifts={shifts} setShifts={setShifts}/>
     </Card>
 
-    <Card title="List of Employees" >
-      <FixedHeader employees={employees} setEmployees={setEmployees}/>
+    <Card title="List of Shifts" >
+      <FixedHeader shifts={shifts} setShifts={setShifts}/>
     </Card>
   </div>;
 };
