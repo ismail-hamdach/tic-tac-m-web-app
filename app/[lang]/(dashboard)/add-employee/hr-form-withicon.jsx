@@ -1,7 +1,9 @@
 "use client"
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Select from "react-select";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from '@/components/ui/button'
@@ -10,7 +12,7 @@ import { Icon } from '@iconify/react';
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from 'next/navigation'; // Import useRouter
 
-const hriFormWithIcon = ({employees, setEmployees}) => {
+const hriFormWithIcon = ({ employees, setEmployees }) => {
   const router = useRouter(); // Initialize router
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -18,7 +20,7 @@ const hriFormWithIcon = ({employees, setEmployees}) => {
   const [ipAddress, setIpAddress] = useState("");
   const [portNumber, setPortNumber] = useState();
   const [departements, setDepartements] = useState([])
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(true); // New state for loading departments
 
 
@@ -45,8 +47,11 @@ const hriFormWithIcon = ({employees, setEmployees}) => {
           throw new Error("Failed to fetch departments.");
         }
         const data = await response.json();
-        
-        setDepartements(data); // Assuming the response is an array of departments
+        const formattedDepartments = data.map(department => ({
+          value: department.id,
+          label: department.department_name
+        }));
+        setDepartements(formattedDepartments); // Assuming the response is an array of departments
       } catch (error) {
         console.error('Error fetching departments:', error);
         toast({
@@ -123,7 +128,7 @@ const hriFormWithIcon = ({employees, setEmployees}) => {
       const addUserResponse = await fetch('/api/employee/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userName: fullName, phoneNumber, ip_address: ipAddress, port: portNumber }),
+        body: JSON.stringify({ userName: fullName, phoneNumber, ip_address: ipAddress, port: portNumber, departmentId: selectedDepartment }),
       });
 
       if (!addUserResponse.ok) {
@@ -133,7 +138,7 @@ const hriFormWithIcon = ({employees, setEmployees}) => {
       if (addUserResponse.ok) {
         const { message, user } = await addUserResponse.json(); // Destructure message and user from the response
         setEmployees((prevEmployees) => [user, ...prevEmployees]); // Add new user to the list
-        
+
         toast({
           title: "Success",
           description: "Employee added successfully with fingerprint.",
@@ -195,29 +200,23 @@ const hriFormWithIcon = ({employees, setEmployees}) => {
         </div>
 
         <div className="col-span-3  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
-          <Label htmlFor="departement" className="lg:min-w-[160px]">Departement</Label>
-          {isLoadingDepartments ? ( // Conditional rendering for loading state
-            <div className="loader text-sm min-w-[350px]">Loading departments...</div> // Placeholder for loading effect
-          ) : (
-            <Select required onValueChange={(value) => setSelectedDepartment(value)} >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Departement" />
-              </SelectTrigger>
-              <SelectContent >
-                <SelectItem value={"departement.id"}>{"departement.department_name"}</SelectItem>
-                <SelectItem value={"departement.id2"}>{"departement.department_name2"}</SelectItem>
-                <SelectItem value={"departement.id3"}>{"departement.department_name3"}</SelectItem>
+          
 
-                {departements.length > 0 ? (
-                  departements.map((departement) => (
-                    <SelectItem  value={departement.id}>{departement.department_name}</SelectItem>
-                  ))
-                ) : (
-                  <SelectItem disabled>No departments available</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          )}
+          {/* <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2"> */}
+            <Label htmlFor="departmentId" className="lg:min-w-[160px]">Department</Label>
+            <Select
+              className="react-select w-full text-[14px] p-0 m-0"
+              classNamePrefix="select"
+              // defaultValue={departmentId}
+              name="departmentId"
+              options={departements}
+              isLoading={isLoadingDepartments}
+              isClearable={true}
+              onChange={(selectedOption) => {
+                setSelectedDepartment(selectedOption.value)
+              }}
+            />
+          {/* </div> */}
           <div className="lg:min-w-[160px] mx-2 cursor-pointer text-primary  hover:text-primary/80" onClick={() => router.push('/departments')}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-house-plus"><path d="M13.22 2.416a2 2 0 0 0-2.511.057l-7 5.999A2 2 0 0 0 3 10v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7.354" /><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M15 6h6" /><path d="M18 3v6" /></svg>
           </div>

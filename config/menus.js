@@ -1,7 +1,7 @@
 import { DashBoard, Medical } from "@/components/svg";
 // Import the Employee icon (assuming it exists)
 import { UserSign, Grid } from "@/components/svg";
-import { User, Settings } from "@/components/svg";
+import { User, Settings, PretentionChartLine2, Calendar } from "@/components/svg";
 
 export const menusConfig = {
   mainNav: [
@@ -40,7 +40,11 @@ export const menusConfig = {
         icon: DashBoard,
         href: "/dashboard",
       },
-      // Add Employee to mainNav
+      {
+        title: "Advanced Search",
+        icon: PretentionChartLine2,
+        href: "/advanced-search",
+      },
       {
         title: "Employees",
         icon: User,
@@ -55,6 +59,11 @@ export const menusConfig = {
         title: "Shifts",
         icon: Medical,
         href: "/shifts",
+      },
+      {
+        title: "Assign Shift",
+        icon: Calendar,
+        href: "/assign-shifts",
       },
       {
         title: "Configuration",

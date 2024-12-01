@@ -33,20 +33,14 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Select from "react-select";
 import { toast } from "@/components/ui/use-toast";
 
 
 import { users, columns } from "./data";
 import { formatDate, formatTime } from "@/lib/utils";
 
-const FixedHeader = ({employees, setEmployees}) => {
+const FixedHeader = ({ employees, setEmployees }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -136,7 +130,7 @@ const FixedHeader = ({employees, setEmployees}) => {
               <TableCell>{employee.user_id}</TableCell>
               <TableCell>{employee.user_name}</TableCell>
               <TableCell>{employee.phone_number}</TableCell>
-              <TableCell>{employee.departement_name ?? "N/A"}</TableCell>
+              <TableCell>{employee.department_name ?? "N/A"}</TableCell>
               <TableCell>{`${formatDate(employee.created_at)} : ${formatTime(employee.created_at)}`}</TableCell>
               <TableCell className="flex justify-end">
                 <div className="flex gap-3">
@@ -189,8 +183,11 @@ export default FixedHeader;
 const EditingDialog = ({ employee, setEmployees }) => {
   const [name, setName] = useState(employee.user_name);
   const [phoneNumber, setPhoneNumber] = useState(employee.phone_number);
-  const [departementName, setDepartementName] = useState(employee.departement_name);
-  const [departementId, setDepartementId] = useState(0);
+  const [departementName, setDepartementName] = useState({
+    value: employee.departement_id,
+    label: employee.department_name
+  });
+  const [departmentId, setDepartmentId] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -203,7 +200,11 @@ const EditingDialog = ({ employee, setEmployees }) => {
           throw new Error("Failed to fetch departments.");
         }
         const data = await response.json();
-        setDepartments(data); // Assuming the response is an array of departments
+        const formattedDepartments = data.map(department => ({
+          value: department.id,
+          label: department.department_name
+        }));
+        setDepartments(formattedDepartments); // Assuming the response is an array of departments
       } catch (error) {
         console.error('Error fetching departments:', error);
       } finally {
@@ -223,7 +224,7 @@ const EditingDialog = ({ employee, setEmployees }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: employee.user_id, name, phoneNumber, departementName }),
+        body: JSON.stringify({ id: employee.user_id, name, phoneNumber,  departementName: departementName.value }),
       });
       if (!response.ok) {
         throw new Error('Failed to update employee');
@@ -236,7 +237,7 @@ const EditingDialog = ({ employee, setEmployees }) => {
       // Update the employee data in the list
       setEmployees((prevEmployees) =>
         prevEmployees.map((emp) =>
-          emp.user_id === employee.user_id ? { ...emp, user_name: name, phone_number: phoneNumber, departement_name: departementName } : emp
+          emp.user_id === employee.user_id ? { ...emp, user_name: name, phone_number: phoneNumber, departement_id: departementName.value, department_name: departementName.label } : emp
         )
       );
     } catch (error) {
@@ -284,29 +285,22 @@ const EditingDialog = ({ employee, setEmployees }) => {
                 onChange={(e) => setPhoneNumber(e.target.value)}
               />
             </div>
-            <div>
-              <Label className="mb-2">Department</Label>
-              {isLoading ? ( // Show loading effect
-                <div className="text-center">
-                  <Icon icon="eos-icons:loading" className="w-6 h-6 animate-spin mx-auto" />
-                </div>
-              ) : (
-                <Select required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Departement" />
-                  </SelectTrigger>
-                  <SelectContent >
-                    {departments.length > 0 ? (
-                      departments.map((departement) => (
-                        <SelectItem key={departement.id} value={departement.id}>{departement.departement_name}</SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem disabled>No departments available</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
+
+            <div >
+              <Label htmlFor="departmentId" className="lg:min-w-[160px]">Department</Label>
+              <Select
+                className="react-select w-full text-[14px] p-0 m-0"
+                required={true}
+                classNamePrefix="select"
+                defaultValue={departementName}
+                name="departmentId"
+                options={departments}
+                isLoading={isLoading}
+                isClearable={true}
+                onChange={(selectedOption) => setDepartementName(selectedOption)}
+              />
             </div>
+
             <div className="flex justify-end space-x-3">
               <DialogClose asChild>
                 <Button type="button" variant="outline" color="destructive">

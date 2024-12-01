@@ -9,15 +9,16 @@ const dbConfig = {
 };
 
 export async function POST(request) {
-  const { id, name, phoneNumber } = await request.json();
+  const { id, name, phoneNumber, departementName } = await request.json();
+  
 
   try {
     const connection = await mysql.createConnection(dbConfig);
     
     // Update employee in the database
     const [result] = await connection.execute(
-      'UPDATE employees SET user_name = ?, phone_number = ? WHERE user_id = ?',
-      [name, phoneNumber, id]
+      'UPDATE employees SET user_name = ?, phone_number = ?, departement_id = ? WHERE user_id = ?',
+      [name, phoneNumber, departementName, id]
     );
 
     await connection.end();
