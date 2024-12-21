@@ -14,6 +14,13 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   let connection;
   try {
+
+    const headers = {
+      'Access-Control-Allow-Origin': '*', // Allow all origins
+      'Access-Control-Allow-Methods': 'GET, OPTIONS', // Allow specific methods
+      'Access-Control-Allow-Headers': 'Content-Type', // Allow specific headers
+    };
+
     // Create a connection to the database
     connection = await mysql.createConnection(dbConfig);
 
@@ -21,7 +28,7 @@ export async function GET() {
     const today = new Date();
     const todayStartOfDay = new Date(today.setHours(0, 0, 0, 0));
     const [rows1] = await connection.execute(`SELECT check_in, check_out FROM attendance_checks where date >= ?`, [todayStartOfDay]);
-    
+
     // Get yesterday's date
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -39,7 +46,7 @@ export async function GET() {
     `, [startOfDay, endOfDay]);
 
     const [rows2] = await connection.execute('SELECT COUNT(*) as total_employees FROM `employees`')
-    
+
     const [rows3] = await connection.execute('SELECT AVG(TIMESTAMPDIFF(HOUR, check_in, check_out)) AS average_hours FROM  attendance_logs WHERE  check_in >= NOW() - INTERVAL 7 DAY;')
     const [rows4] = await connection.execute('SELECT  AVG(TIMESTAMPDIFF(HOUR, check_in, check_out)) AS average_hours FROM    attendance_logs WHERE  check_in >= NOW() - INTERVAL 14 DAY AND check_in < NOW() - INTERVAL 7 DAY;')
     const [rows5] = await connection.execute("SELECT DATE_FORMAT(check_in, '%Y-%m') AS month, COUNT(*) AS completed_employees FROM  attendance_logs WHERE  TIMESTAMPDIFF(HOUR, check_in, check_out) >= 8 AND check_in >= NOW() - INTERVAL 9 MONTH GROUP BY  month ORDER BY  month;")
@@ -57,9 +64,9 @@ export async function GET() {
         ORDER BY 
           month;
       `);
-    
+
     // Return the results including all rows
-    return NextResponse.json({ 
+    return NextResponse.json({
       data: {
         attendanceChecks: rows1[0],
         completedNotCompleted: rows[0],
@@ -69,8 +76,11 @@ export async function GET() {
         completedEmployeesLastNineMonths: rows5,
         notCompletedEmployeesLastNineMonths: rows6,
         averageWorkingHoursLastNineMonths
-      } 
-    }, { status: 200 });
+      }
+    }, {
+      status: 200,
+      headers
+    });
   } catch (error) {
     console.error('Database query error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

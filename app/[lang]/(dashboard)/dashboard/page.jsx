@@ -19,6 +19,7 @@ const page = () => {
         }
         const data = await response.json();
         setAnalyticsData(data.data); // Assuming data is in the format { data: [...] }
+        console.log(data.data)
       } catch (error) {
         console.error('Error fetching analytics:', error);
       } finally {
