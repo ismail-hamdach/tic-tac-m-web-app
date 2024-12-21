@@ -3,10 +3,10 @@ import mysql from 'mysql2/promise';
 
 // Database connection configuration
 const dbConfig = {
-  host: process.env.NEXT_DB_HOST,
-  user: process.env.NEXT_DB_USER,
-  password: process.env.NEXT_DB_PASSWORD,
-  database: process.env.NEXT_DB_NAME,
+  host: "172.105.70.171",
+  user: "omarhaya_tictacm",
+  password: "7veEM;#KL_BJ",
+  database: "omarhaya_tictacm",
 };
 
 export const dynamic = 'force-dynamic';

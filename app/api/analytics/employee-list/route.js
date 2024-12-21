@@ -1,9 +1,9 @@
 import mysql from 'mysql2/promise'; // Adjust the import based on your project structure
 const dbConfig = {
-    host: process.env.NEXT_DB_HOST,
-    user: process.env.NEXT_DB_USER,
-    password: process.env.NEXT_DB_PASSWORD,
-    database: process.env.NEXT_DB_NAME,
+    host: "172.105.70.171",
+  user: "omarhaya_tictacm",
+  password: "7veEM;#KL_BJ",
+  database: "omarhaya_tictacm",
 };
 // New endpoint to retrieve employees who completed 8 hours yesterday
 export const dynamic = 'force-dynamic';
