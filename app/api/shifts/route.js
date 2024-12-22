@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { dbConfig } from "@/provider/db.provider"
 
 // Create a MySQL connection pool
-const pool = mysql.createPool({
-  host: process.env.NEXT_DB_HOST, // e.g., 'localhost'
-  user: process.env.NEXT_DB_USER, // e.g., 'root'
-  password: process.env.NEXT_DB_PASSWORD,
-  database: process.env.NEXT_DB_NAME,
-});
+const pool = mysql.createPool(dbConfig);
 
 export async function GET(req) {
   try {

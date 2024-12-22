@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise'; // Ensure you have mysql2 installed
 
-const dbConfig = {
-    host: process.env.NEXT_DB_HOST,
-    user: process.env.NEXT_DB_USER,
-    password: process.env.NEXT_DB_PASSWORD,
-    database: process.env.NEXT_DB_NAME,
-};
+import { dbConfig } from "@/provider/db.provider"
+
 
 export async function POST(request) {
   const { id, name, phoneNumber, departementName } = await request.json();

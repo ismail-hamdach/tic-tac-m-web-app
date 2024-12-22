@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { dbConfig } from "@/provider/db.provider"
 
 export const dynamic = 'force-dynamic';
 
@@ -7,12 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     // Create a connection to the MySQL database
-    const connection = await mysql.createConnection({
-      host: process.env.NEXT_DB_HOST,
-      user: process.env.NEXT_DB_USER,
-      password: process.env.NEXT_DB_PASSWORD,
-      database: process.env.NEXT_DB_NAME,
-    });
+    const connection = await mysql.createConnection(dbConfig);
 
     // Execute the query to fetch all users with their departments
     const [rows] = await connection.execute(`

@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-
+import { dbConfig } from "@/provider/db.provider"
 // Database connection configuration
-const dbConfig = {
-  host: "172.105.70.171",
-  user: "omarhaya_tictacm",
-  password: "7veEM;#KL_BJ",
-  database: "omarhaya_tictacm",
-};
+
 
 export const dynamic = 'force-dynamic';
 

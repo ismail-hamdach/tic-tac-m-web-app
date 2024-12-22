@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { dbConfig } from "@/provider/db.provider"
 
 // Create a MySQL connection pool
-const dbConfig = {
-    host: process.env.NEXT_DB_HOST,
-    user: process.env.NEXT_DB_USER,
-    password: process.env.NEXT_DB_PASSWORD,
-    database: process.env.NEXT_DB_NAME,
-};
+
 
 export async function POST(request) {
     const { id, ip_address, port } = await request.json(); // Get the employee ID from the request body

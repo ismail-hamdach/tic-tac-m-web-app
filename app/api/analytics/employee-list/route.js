@@ -1,10 +1,6 @@
 import mysql from 'mysql2/promise'; // Adjust the import based on your project structure
-const dbConfig = {
-    host: "172.105.70.171",
-  user: "omarhaya_tictacm",
-  password: "7veEM;#KL_BJ",
-  database: "omarhaya_tictacm",
-};
+import { dbConfig } from "@/provider/db.provider"
+
 // New endpoint to retrieve employees who completed 8 hours yesterday
 export const dynamic = 'force-dynamic';
 
