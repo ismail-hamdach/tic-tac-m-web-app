@@ -20,9 +20,39 @@ const hriFormWithIcon = ({ employees, setEmployees }) => {
   const [ipAddress, setIpAddress] = useState("");
   const [portNumber, setPortNumber] = useState();
   const [departements, setDepartements] = useState([])
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(true); // New state for loading departments
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [shifts, setShifts] = useState([])
+  const [selectedShift, setSelectedShift] = useState(null);
+  const [isLoadingShift, setIsLoadingShift] = useState(true); // New state for loading departments
 
+
+  const fetchShifts = async (id) => {
+    if(id == null) return;
+    try {
+      setIsLoadingShift(true)
+      console.log(id)
+      const response = await fetch(`/api/shifts?id=${id}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch Shifts")
+      }
+      const data = await response.json()
+      const formattedShifts = data.map(shift => ({
+        value: shift.shift_id,
+        label: shift.start_time + " - " + shift.end_time
+      }));
+      setShifts(formattedShifts);
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while fetching shifts.",
+        color: "destructive",
+      });
+    } finally {
+      setIsLoadingShift(false)
+    }
+  }
 
   useEffect(() => {
     // Retrieve IP address and port from local storage
@@ -67,6 +97,11 @@ const hriFormWithIcon = ({ employees, setEmployees }) => {
     fetchDepartments(); // Call the function to fetch departments
 
   }, []);
+
+  useEffect(() => {
+    console.log(selectedDepartment)
+    fetchShifts(selectedDepartment);
+  }, [selectedDepartment])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -128,7 +163,7 @@ const hriFormWithIcon = ({ employees, setEmployees }) => {
       const addUserResponse = await fetch('/api/employee/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userName: fullName, phoneNumber, ip_address: ipAddress, port: portNumber, departmentId: selectedDepartment }),
+        body: JSON.stringify({ userName: fullName, phoneNumber, ip_address: ipAddress, port: portNumber, departmentId: selectedDepartment, shiftId: selectedShift }),
       });
 
       if (!addUserResponse.ok) {
@@ -200,24 +235,46 @@ const hriFormWithIcon = ({ employees, setEmployees }) => {
         </div>
 
         <div className="col-span-3  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
-          
+
 
           {/* <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2"> */}
-            <Label htmlFor="departmentId" className="lg:min-w-[160px]">Department</Label>
-            <Select
-              className="react-select w-full text-[14px] p-0 m-0"
-              classNamePrefix="select"
-              // defaultValue={departmentId}
-              name="departmentId"
-              options={departements}
-              isLoading={isLoadingDepartments}
-              isClearable={true}
-              onChange={(selectedOption) => {
-                setSelectedDepartment(selectedOption.value)
-              }}
-            />
+          <Label htmlFor="departmentId" className="lg:min-w-[160px]">Department</Label>
+          <Select
+            className="react-select w-full text-[14px] p-0 m-0"
+            classNamePrefix="select"
+            // defaultValue={departmentId}
+            name="departmentId"
+            options={departements}
+            isLoading={isLoadingDepartments}
+            isClearable={true}
+            onChange={(selectedOption) => {
+              setSelectedDepartment(selectedOption.value)
+            }}
+          />
           {/* </div> */}
           <div className="lg:min-w-[160px] mx-2 cursor-pointer text-primary  hover:text-primary/80" onClick={() => router.push('/departments')}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-house-plus"><path d="M13.22 2.416a2 2 0 0 0-2.511.057l-7 5.999A2 2 0 0 0 3 10v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7.354" /><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M15 6h6" /><path d="M18 3v6" /></svg>
+          </div>
+        </div>
+        <div className="col-span-3  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
+
+
+          {/* <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2"> */}
+          <Label htmlFor="shiftId" className="lg:min-w-[160px]">Shift</Label>
+          <Select
+            className="react-select w-full text-[14px] p-0 m-0"
+            classNamePrefix="select"
+            // defaultValue={departmentId}
+            name="shiftId"
+            options={shifts}
+            isLoading={isLoadingShift}
+            isClearable={true}
+            onChange={(selectedOption) => {
+              setSelectedShift(selectedOption.value)
+            }}
+          />
+          {/* </div> */}
+          <div className="lg:min-w-[160px] mx-2 cursor-pointer text-primary  hover:text-primary/80" onClick={() => router.push('/shifts')}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-house-plus"><path d="M13.22 2.416a2 2 0 0 0-2.511.057l-7 5.999A2 2 0 0 0 3 10v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7.354" /><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M15 6h6" /><path d="M18 3v6" /></svg>
           </div>
         </div>

@@ -9,7 +9,7 @@ import { departments, priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import DatePickerWithRange from "@/components/date-picker-with-range";
 
-export function DataTableToolbar({ table }) {
+export function DataTableToolbar({ table, dateControl }) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
@@ -23,7 +23,7 @@ export function DataTableToolbar({ table }) {
         className="h-8 min-w-[200px] max-w-sm"
       />
 
-      <DatePickerWithRange className={"rounded-xl border-2 text-"}/>
+      <DatePickerWithRange dateControl = {dateControl} className={"rounded-xl border-2 text-"}/>
 
 
       {table.getColumn("department") && (
@@ -33,13 +33,13 @@ export function DataTableToolbar({ table }) {
           options={departments}
         />
       )}
-      {table.getColumn("priority") && (
+      {/* {table.getColumn("priority") && (
         <DataTableFacetedFilter
           column={table.getColumn("priority")}
           title="Priority"
           options={priorities}
         />
-      )}
+      )} */}
       {isFiltered && (
         <Button
           variant="outline"

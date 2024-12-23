@@ -22,7 +22,7 @@ import { labels } from "../data/data";
 import { taskSchema } from "../data/schema";
 
 export function DataTableRowActions({ row }) {
-  const task = taskSchema.parse(row.original);
+  // const task = taskSchema.parse(row.original);
 
   return (
     <DropdownMenu>
@@ -35,7 +35,7 @@ export function DataTableRowActions({ row }) {
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      {/* <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem>Edit</DropdownMenuItem>
         <DropdownMenuItem>Make a copy</DropdownMenuItem>
         <DropdownMenuItem>Favorite</DropdownMenuItem>
@@ -57,7 +57,7 @@ export function DataTableRowActions({ row }) {
           Delete
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
-      </DropdownMenuContent>
+      </DropdownMenuContent> */}
     </DropdownMenu>
   );
 }

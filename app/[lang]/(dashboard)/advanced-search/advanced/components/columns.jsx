@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { labels, priorities, departments, statuses } from "../data/data";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { formatDate, formatTime } from "@/lib/utils";
 
 
 export const columns = [
@@ -38,7 +39,7 @@ export const columns = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Date" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("date")}</div>,
+    cell: ({ row }) => <div className="w-[80px]">{formatDate(row.getValue("date"))}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -162,7 +163,7 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2 rounded-lg ${row.getValue("delay") == true ? 'bg-orange-500 text-white' : ''}`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium ${row.getValue("delay") == true ? 'bg-orange-500' : ''}`}>
-            {row.getValue("delay") == true ? 'Yes' : 'No'}
+            {row.getValue("delay") }
           </span>
         </div>
       );
@@ -180,7 +181,7 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2 rounded-lg ${row.getValue("absent") == true ? 'bg-red-500 text-white' : ''}`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium ${row.getValue("absent") == true ? 'bg-red-500' : ''}`}>
-            {row.getValue("absent") == true ? 'Yes' : 'No'}
+            {row.getValue("absent") }
           </span>
         </div>
       );

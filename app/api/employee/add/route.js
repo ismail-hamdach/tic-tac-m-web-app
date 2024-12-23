@@ -7,7 +7,7 @@ import { dbConfig } from "@/provider/db.provider"
 
 export async function POST(request) {
     try {
-        const { userName, phoneNumber, ip_address, port, departmentId } = await request.json();
+        const { userName, phoneNumber, ip_address, port, departmentId, shiftId } = await request.json();
 
         // Validation checks
         if (!userName || typeof userName !== 'string' || userName.trim() === '') {
@@ -24,6 +24,9 @@ export async function POST(request) {
         }
         if (!port || typeof departmentId !== 'number' || departmentId < 1 || departmentId > 65535) {
             return NextResponse.json({ error: 'Invalid departmentId' }, { status: 400 });
+        }
+        if (!port || typeof shiftId !== 'number' || shiftId < 1 || shiftId > 65535) {
+            return NextResponse.json({ error: 'Invalid shiftId' }, { status: 400 });
         }
 
         // Check connection with Flask API
@@ -59,6 +62,10 @@ export async function POST(request) {
         await connection.execute(
             'INSERT INTO employees (user_id, user_name, phone_number, privilege, departement_id) VALUES (?, ?, ?, ?, ?)',
             [addUserResult.data.user_id, userName, phoneNumber, addUserResult.data.privilege, departmentId]
+        );
+        await connection.execute(
+            'INSERT INTO schedules (employee_id, shift_id) VALUES (?,  ?)',
+            [addUserResult.data.user_id, shiftId]
         );
 
         const [rows] = await connection.execute(`

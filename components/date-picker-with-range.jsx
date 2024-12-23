@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {  format } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -13,8 +13,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useTheme } from "next-themes";
-export default function DatePickerWithRange({ className }) {
-  const [date, setDate] = React.useState(null);
+export default function DatePickerWithRange({ className, dateControl }) {
+  const { date, setDate } = dateControl;
   const { theme: mode } = useTheme();
 
   return (
@@ -49,7 +49,7 @@ export default function DatePickerWithRange({ className }) {
             defaultMonth={date?.from}
             selected={date}
             onSelect={setDate}
-            // numberOfMonths={2}
+          // numberOfMonths={2}
           />
         </PopoverContent>
       </Popover>
