@@ -34,6 +34,9 @@ const page = () => {
     <div className="space-y-6 pt-8">
       {loading ? <div>Loading...</div> :
         <>
+          <div >
+            <a href="https://devsolcom.com/cpanelwebcall/dfqoiapfgifxaxtpyvkqlmggceealzpr" target="_blank" className="px-5 py-2 bg-emerald-600 text-white cursor-pointer hover:scale-110 hover:shadow-lg rounded-xl" >Connect</a>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <ReportsArea analyticsData={analyticsData} />
           </div>

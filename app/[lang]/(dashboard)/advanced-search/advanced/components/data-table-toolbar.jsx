@@ -9,7 +9,7 @@ import { departments, priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import DatePickerWithRange from "@/components/date-picker-with-range";
 
-export function DataTableToolbar({ table, dateControl }) {
+export function DataTableToolbar({ table, dateControl, departments }) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
