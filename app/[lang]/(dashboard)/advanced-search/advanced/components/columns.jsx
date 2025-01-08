@@ -208,7 +208,7 @@ export const columns = [
   {
     accessorKey: "total_hours_delay",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Total Hours Delay" />
+      <DataTableColumnHeader column={column} title="Total Minutes Delay" />
     ),
     cell: ({ row }) => {
       const label = labels.find((label) => label.value === row.original.label);
