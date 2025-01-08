@@ -160,9 +160,9 @@ export const columns = [
       const label = labels.find((label) => label.value === row.original.label);
 
       return (
-        <div className={`flex items-center justify-center gap-2 rounded-lg ${row.getValue("delay") == true ? 'bg-orange-500 text-white' : ''}`}>
+        <div className={`flex items-center justify-center gap-2 rounded-lg ${row.getValue("delay") != 0 ? 'bg-orange-500 text-white' : ''}`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className={`max-w-[500px] truncate font-medium ${row.getValue("delay") != 0 ? 'bg-orange-500' : ''}`}>
+          <span className={`max-w-[500px] truncate font-medium`}>
             {row.getValue("delay") == 0 ? "No" : "Yes"}
           </span>
         </div>
