@@ -13,7 +13,7 @@ const page = () => {
     const fetchAnalytics = async () => {
       setLoading(true); // {{ edit_3 }}
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/analytics`);
+        const response = await fetch(`/api/analytics`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
