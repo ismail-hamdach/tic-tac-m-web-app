@@ -7,7 +7,10 @@ export default function AdvancedTable() {
   const [isLoadingData, setIsLoadingData] = useState(true)
   const [data, setData] = useState([])
   const [departments, setDepartments] = useState([])
-  const [date, setDate] = useState({ from: new Date(), to: new Date() })
+  const [date, setDate] = useState({ 
+    from: new Date(new Date().setDate(new Date().getDate() - 1)),
+    to: new Date() 
+  })
 
   const fetchData = async () => {
     try {
