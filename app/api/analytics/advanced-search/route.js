@@ -21,7 +21,7 @@ export async function POST(req) {
                 TIME(al.check_in) AS check_in,
                 TIME(al.check_out) AS check_out,
                 CASE 
-                    WHEN al.check_in > sh.start_time THEN TIMESTAMPDIFF(MINUTE, sh.start_time, al.check_in)
+                    WHEN al.check_in > sh.start_time THEN CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 3600), ' H, ', MOD(FLOOR(TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 60), 60))
                     ELSE 0
                 END AS delay,
                 CASE 
@@ -34,7 +34,7 @@ export async function POST(req) {
                 END AS day_off,
                 SUM(
                     CASE 
-                        WHEN al.check_in > sh.start_time THEN TIMESTAMPDIFF(MINUTE, sh.start_time, al.check_in)
+                        WHEN al.check_in > sh.start_time THEN CONCAT(FLOOR (TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 3600), ' H, ', MOD(FLOOR(TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 60), 60))
                         ELSE 0
                     END
                 ) OVER (PARTITION BY e.user_id) AS total_hours_delay
