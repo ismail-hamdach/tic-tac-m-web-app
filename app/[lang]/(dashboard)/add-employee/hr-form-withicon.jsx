@@ -39,7 +39,7 @@ const hriFormWithIcon = ({ employees, setEmployees }) => {
       const data = await response.json()
       const formattedShifts = data.map(shift => ({
         value: shift.shift_id,
-        label: shift.start_time + " - " + shift.end_time
+        label: shift.shift
       }));
       setShifts(formattedShifts);
     } catch (error) {

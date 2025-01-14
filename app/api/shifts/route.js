@@ -6,26 +6,42 @@ import { dbConfig } from "@/provider/db.provider"
 const pool = mysql.createPool(dbConfig);
 
 export async function GET(req) {
-  try {
-    const [rows] = await pool.query(`
-      SELECT
-          shift_id,
-          shift_name,
-          start_time,
-          end_time,
-          shift_created_at,
-          department_name,
-          s.departement_id as department_id
-      FROM
-          shifts s
-      LEFT JOIN departments d ON
-          s.departement_id = d.id;
-      `); // Adjusted query for shifts
-    return NextResponse.json(rows);
-  } catch (error) {
-    console.error('Error fetching shifts:', error);
-    return NextResponse.json({ message: "Failed to fetch shifts." }, { status: 500 });
+  const url = new URL(req.url)
+  const searchParams = new URLSearchParams(url.searchParams)
+  const departmentID = searchParams.get("id")
+
+
+  if (departmentID) {
+    try {
+      const [rows] = await pool.query(`SELECT shift_id, concat(DATE_FORMAT(start_time, '%H:%i'), " - " ,DATE_FORMAT(end_time, '%H:%i')) shift FROM shifts s JOIN departments d ON d.id = s.departement_id WHERE departement_id = ${departmentID}`); // Adjust the query as needed
+      return NextResponse.json(rows);
+    } catch (error) {
+      console.error('Error fetching department:', error);
+      return NextResponse.json({ message: "Failed to fetch departments." }, { status: 500 });
+    }
+  } else {
+    try {
+      const [rows] = await pool.query(`
+        SELECT
+            shift_id,
+            shift_name,
+            start_time,
+            end_time,
+            shift_created_at,
+            department_name,
+            s.departement_id as department_id
+        FROM
+            shifts s
+        LEFT JOIN departments d ON
+            s.departement_id = d.id;
+        `); // Adjusted query for shifts
+      return NextResponse.json(rows);
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+      return NextResponse.json({ message: "Failed to fetch shifts." }, { status: 500 });
+    }
   }
+
 }
 
 export async function POST(req) {
