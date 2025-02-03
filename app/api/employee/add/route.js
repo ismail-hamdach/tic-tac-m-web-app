@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { dbConfig } from "@/provider/db.provider"
+import { pool } from "@/provider/db.provider"
 
 // MySQL connection configuration
 
@@ -58,17 +58,17 @@ export async function POST(request) {
         const addUserResult = await addUserResponse.json();
 
         // Add user to MySQL database
-        const connection = await mysql.createConnection(dbConfig);
-        await connection.execute(
+        // const connection = await mysql.createConnection(dbConfig);
+        await pool.query(
             'INSERT INTO employees (user_id, user_name, phone_number, privilege, departement_id) VALUES (?, ?, ?, ?, ?)',
             [addUserResult.data.user_id, userName, phoneNumber, addUserResult.data.privilege, departmentId]
         );
-        await connection.execute(
+        await pool.query(
             'INSERT INTO schedules (employee_id, shift_id) VALUES (?,  ?)',
             [addUserResult.data.user_id, shiftId]
         );
 
-        const [rows] = await connection.execute(`
+        const [rows] = await pool.query(`
             SELECT
                
                 e.user_id,
