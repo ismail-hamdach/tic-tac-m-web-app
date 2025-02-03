@@ -60,11 +60,11 @@ export const menusConfig = {
         icon: Medical,
         href: "/shifts",
       },
-      // {
-      //   title: "Assign Shift",
-      //   icon: Calendar,
-      //   href: "/assign-shifts",
-      // },
+      {
+        title: "Assign Shift",
+        icon: Calendar,
+        href: "/assign-shifts",
+      },
       {
         title: "Configuration",
         icon: Settings,

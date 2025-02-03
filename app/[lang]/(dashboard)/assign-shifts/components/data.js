@@ -1,26 +1,26 @@
 export const columns = [
   {
-    key: "shift_id",
+    key: "schedule_id",
     label: "Id",
   },
   {
-    key: "shift_name",
+    key: "user_name",
     label: "Name",
-  },
-  {
-    key: "start_time",
-    label: "Start Time",
-  },
-  {
-    key: "end_time",
-    label: "End Time",
   },
   {
     key: "department_name",
     label: "Department",
   },
   {
-    key: "shift_created_at",
+    key: "shift",
+    label: "Shift",
+  },
+  {
+    key: "phone_number",
+    label: "Phone Number",
+  },
+  {
+    key: "created_at",
     label: "Created at",
   },
   {

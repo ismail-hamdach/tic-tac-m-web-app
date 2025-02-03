@@ -25,17 +25,20 @@ const styles = {
   }),
 };
 
-const hriFormWithIcon = ({ shifts, setShifts }) => {
+const hriFormWithIcon = ({ schedules, setSchedules }) => {
 
 
 
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [shiftName, setShiftName] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [departmentId, setDepartmentId] = useState('');
-  const [departments, setDepartments] = useState([]);
+  const [isLoadingShifts, setIsLoadingShifts] = useState(true);
+
+  const [departementName, setDepartementName] = useState(null);
+  const [departementId, setDepartementId] = useState(null);
+  const [employeeId, setEmployeeId] = useState(null);
+  const [shiftId, setShiftId] = useState('');
+  const [shifts, setShifts] = useState([]);
+  const [employees, setEmployees] = useState([]);
 
 
 
@@ -44,22 +47,23 @@ const hriFormWithIcon = ({ shifts, setShifts }) => {
     const fetchDepartments = async () => {
       setIsLoadingDepartments(true); // Set loading to true when fetching starts
       try {
-        const response = await fetch('/api/departements');
+        const response = await fetch('/api/employee');
         if (!response.ok) {
-          throw new Error("Failed to fetch departments.");
+          throw new Error("Failed to fetch employee.");
         }
         const data = await response.json();
 
-        const formattedDepartments = data.map(department => ({
-          value: department.id,
-          label: department.department_name
+        const fomattedEmployee = data.map(employee => ({
+          value: employee.user_id,
+          label: employee.user_name,
+          employee
         }));
-        setDepartments(formattedDepartments); // Assuming the response is an array of departments
+        setEmployees(fomattedEmployee); // Assuming the response is an array of departments
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error('Error fetching employees:', error);
         toast({
           title: "Error",
-          description: error.message || "An error occurred while fetching departments.",
+          description: error.message || "An error occurred while fetching employees.",
           color: "destructive",
         });
       } finally {
@@ -72,13 +76,47 @@ const hriFormWithIcon = ({ shifts, setShifts }) => {
   }, []);
 
 
+  useEffect(() => {
+    const fetchShifts = async () => {
+      setIsLoadingShifts(true)
+      setShiftId(null)
+      const selectedEmployee = employees.find(employee => employee.value === employeeId)
+      const departementId = selectedEmployee?.employee.departement_id
+      try {
+        if (!departementId) return
+        const response = await fetch(`/api/shifts?id=${departementId}`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch shift.");
+        }
+        const data = await response.json()
+        const formattedShifts = data.map(elmnt => ({
+          value: elmnt.shift_id,
+          label: elmnt.shift
+        }))
+        setShifts(formattedShifts)
+      } catch (error) {
+        console.error('Error fetching schedules:', error);
+        toast({
+          title: "Error",
+          description: error.message || "An error occurred while fetching schedules.",
+          color: "destructive",
+        });
+      } finally {
+        setIsLoadingShifts(false)
+      }
+    }
+
+    fetchShifts();
+  }, [employeeId])
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+    
     // Basic validation
-    if (!shiftName || !startTime || !endTime || !departmentId) {
+    if (!shiftId || !employeeId) {
       toast({
         title: "Validation Error",
         description: "Please fill in all fields.",
@@ -92,26 +130,27 @@ const hriFormWithIcon = ({ shifts, setShifts }) => {
 
     try {
 
-      const addDeptResponse = await fetch('/api/shifts', {
+      const addDeptResponse = await fetch('/api/schedules', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shift_name: shiftName, start_time: startTime, end_time: endTime, departement_id: departmentId }),
+        body: JSON.stringify({ shiftId, employeeId }),
       });
 
       if (!addDeptResponse.ok) {
-        throw new Error(". Please try again.");
+        throw new Error("Failed. Please try again.");
       }
 
       if (addDeptResponse.ok) {
         const newShift = await addDeptResponse.json()
-        setShifts((prevShifts) => [newShift, ...prevShifts])
+        console.log(newShift)
+        setSchedules((prevShifts) => [newShift.schedule, ...prevShifts])
         toast({
           title: "Success",
-          description: "Department added successfully.",
+          description: "Schedule added successfully.",
           color: "success",
         });
       } else {
-        throw new Error("Failed to add Department. Please try again.");
+        throw new Error("Failed to add Schedule. Please try again.");
       }
 
     } catch (error) {
@@ -129,67 +168,44 @@ const hriFormWithIcon = ({ shifts, setShifts }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-2 gap-4">
-        <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
-          <Label htmlFor="shiftName" className="lg:min-w-[160px]">Shift Name</Label>
-          <InputGroup merged>
-            <InputGroupText>
-              <Icon icon="line-md:pencil-alt-twotone" />
-            </InputGroupText>
-            <Input
-              type="text"
-              placeholder="Shift name"
-              id="shiftName"
-              value={shiftName}
-              onChange={(e) => setShiftName(e.target.value)}
-              required
-            />
-          </InputGroup>
-        </div>
-        <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
 
-          <Label htmlFor="startTime" className="lg:min-w-[160px]">Start time</Label>
-          <InputGroup merged>
-            <InputGroupText>
-              <Icon icon="material-symbols:nest-clock-farsight-analog-outline" />
-            </InputGroupText>
-            <Input
-              type="time"
-              id="startTime"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              required
-            />
-          </InputGroup>
-        </div>
-        <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
 
-          <Label htmlFor="endTime" className="lg:min-w-[160px]">End time</Label>
-          <InputGroup merged>
-            <InputGroupText>
-              <Icon icon="material-symbols:nest-clock-farsight-analog-outline" />
-            </InputGroupText>
-            <Input
-              type="time"
-              id="endTime"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              required
-            />
-          </InputGroup>
-
-        </div>
 
         <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
-          <Label htmlFor="departmentId" className="lg:min-w-[160px]">Department Name</Label>
+          <Label htmlFor="employeeId" className="lg:min-w-[160px]">Employee Name</Label>
           <Select
             className="react-select w-full text-[14px] p-0 m-0"
             classNamePrefix="select"
-            defaultValue={departmentId}
-            name="departmentId"
-            options={departments}
+            defaultValue={employeeId}
+            name="employeeId"
+            options={employees}
             isLoading={isLoadingDepartments}
             isClearable={true}
-            onChange={(selectedOption) => setDepartmentId(selectedOption.value)}
+            onChange={(selectedOption) => {
+              setEmployeeId(selectedOption.value)
+              setDepartementId(selectedOption?.employee.departement_id || Null)
+              setDepartementName(selectedOption?.employee.department_name || Null)
+              setShiftId(null);
+            }}
+          />
+        </div>
+        <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
+          <Label htmlFor="departmentName" className="lg:min-w-[160px]">Department Name</Label>
+          <span className="react-select w-full text-[14px] p-0 m-0">
+            {departementName || 'No employee selected'}
+          </span>
+        </div>
+        <div className="col-span-2  flex flex-col lg:items-center lg:flex-row lg:gap-0 gap-2">
+          <Label htmlFor="shiftId" className="lg:min-w-[160px]">Shift</Label>
+          <Select
+            className="react-select w-full text-[14px] p-0 m-0"
+            classNamePrefix="select"
+            value={shifts?.find(shift => shift.value === shiftId) || null}
+            name="shiftId"
+            options={shifts}
+            isLoading={isLoadingShifts}
+            isClearable={true}
+            onChange={(selectedOption) => setShiftId(selectedOption ? selectedOption.value : null)}
           />
         </div>
 

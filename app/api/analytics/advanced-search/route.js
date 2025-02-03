@@ -13,47 +13,83 @@ export async function POST(req) {
     const { start_time, end_time } = await req.json()
 
     const [rows] = await connection.execute(
-        `
+    `
+        WITH RECURSIVE DateRange AS (
+            -- Anchor member: Start with the initial date (x)
             SELECT 
-                e.user_name AS name,
-                d.department_name AS department,
-                DATE(al.check_in) AS date,
-                TIME(al.check_in) AS check_in,
-                TIME(al.check_out) AS check_out,
-                CASE 
-                    WHEN al.check_in > sh.start_time THEN CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 3600), ' H, ', MOD(FLOOR(TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 60), 60))
-                    ELSE 0
-                END AS delay,
-                CASE 
-                    WHEN al.check_in IS NULL AND al.check_out IS NULL THEN 'Yes'
-                    ELSE 'No'
-                END AS absent,
-                CASE 
-                    WHEN s.rest_days = 1 THEN 'Yes'
-                    ELSE 'No'
-                END AS day_off,
-                SUM(
-                    CASE 
-                        WHEN al.check_in > sh.start_time THEN CONCAT(FLOOR (TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 3600), ' H, ', MOD(FLOOR(TIMESTAMPDIFF(SECOND, sh.start_time, al.check_in) / 60), 60))
-                        ELSE 0
-                    END
-                ) OVER (PARTITION BY e.user_id) AS total_hours_delay
+                ? AS date -- Replace '2023-10-01' with your start date (x)
+            UNION ALL
+            -- Recursive member: Add 1 day to the previous date
+            SELECT 
+                DATE_ADD(date, INTERVAL 1 DAY)
             FROM 
-                employees e
-            LEFT JOIN 
-                departments d ON e.departement_id = d.id
-            LEFT JOIN 
-                attendance_logs al ON e.user_id = al.user_id
-            LEFT JOIN 
-                schedules s ON e.user_id = s.employee_id
-            LEFT JOIN 
-                shifts sh ON s.shift_id = sh.shift_id
+                DateRange
             WHERE 
-                DATE(al.check_in) BETWEEN ? AND ? 
-            ORDER BY 
-                e.user_name, DATE(al.check_in);
+                date < ? -- Replace '2023-10-31' with your end date (y)
+        ),
+        EmployeeDates AS (
+            -- Cross join the generated dates with the employees table
+            SELECT 
+                e.user_id, 
+                e.user_name,
+                dr.date
+            FROM 
+                DateRange dr
+            CROSS JOIN 
+                employees e
+        )
+
+        SELECT 
+            ed.user_id, 
+            ed.user_name, 
+            d.department_name, 
+            ed.date,
+            a.check_in, 
+            a.check_out, 
+            sh.start_time, 
+            sh.end_time, 
+            CASE 
+                WHEN a.check_in is NULL THEN 2
+                WHEN TIME(a.check_in) <= TIME(sh.start_time) THEN 0
+                ELSE 1
+            END AS delay,
+            
+            CASE 
+                WHEN a.check_in is NULL THEN 1
+                ELSE 0
+            END AS Absent,
+            
+            CASE
+                WHEN a.check_in is NULL THEN 0
+                ELSE 0
+            END AS Day_off,
+
+            CASE 
+                WHEN a.check_in is NULL THEN NULL
+                WHEN TIME(a.check_in) <= TIME(sh.start_time) THEN 0
+                ELSE TIMESTAMPDIFF(MINUTE, sh.start_time, a.check_in)  
+            END AS total_minutes_delay
+        FROM 
+            EmployeeDates ed
+        LEFT JOIN 
+            attendance_logs a 
+            ON ed.user_id = a.user_id 
+            AND ed.date = DATE(a.check_in)
+        LEFT JOIN 
+            schedules s 
+            ON ed.user_id = s.employee_id
+        LEFT JOIN 
+            shifts sh 
+            ON sh.shift_id = s.shift_id
+        LEFT JOIN 
+            departments d 
+            ON d.id = sh.departement_id
+        WHERE 
+            ed.date BETWEEN ? AND ?
+        ORDER BY 
+            ed.user_id, ed.date;
     `,
-        [start_time, end_time]
+        [start_time, end_time, start_time, end_time]
     );
 
 

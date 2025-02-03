@@ -44,7 +44,7 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "user_name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -55,20 +55,20 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("name")}
+            {row.getValue("user_name")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "department",
+    accessorKey: "department_name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Departement" />
     ),
     cell: ({ row }) => {
       const department = departments.find(
-        (departments) => departments.value === row.getValue("department")
+        (departments) => departments.value === row.getValue("department_name")
       );
 
       if (!department) {
@@ -127,7 +127,7 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("check_in")}
+            {row.getValue("check_in") || "Null"}
           </span>
         </div>
       );
@@ -145,7 +145,7 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("check_out")}
+            {row.getValue("check_out") || 'Null'}
           </span>
         </div>
       );
@@ -157,32 +157,87 @@ export const columns = [
       <DataTableColumnHeader column={column} title="Delay" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
+      const delayValue = row.getValue("delay");
+      const logId = row.original.id; // Assuming each log has a unique `id` field
+  
+      // Function to update delay
+      const updateDelay = async (newDelayValue) => {
+        try {
+          const response = await fetch(`/api/logs/${logId}/delay`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ delay: newDelayValue }),
+          });
+  
+          if (!response.ok) {
+            throw new Error("Failed to update delay");
+          }
+  
+          // Handle success (e.g., refresh the table or show a notification)
+          console.log("Delay updated successfully");
+        } catch (error) {
+          console.error("Error updating delay:", error);
+        }
+      };
+  
       return (
-        <div className={`flex items-center justify-center gap-2 rounded-lg ${row.getValue("delay") != 0 ? 'bg-orange-500 text-white' : ''}`}>
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("delay") == 0 ? "No" : "Yes"}
-          </span>
+        <div className={`flex items-center justify-center gap-2 rounded-lg ${delayValue != 0 ? 'bg-orange-500 text-white' : delayValue == 2 ? 'bg-red-500 text-white' : ""}`}>
+          <select
+            value={delayValue}
+            onChange={(e) => updateDelay(Number(e.target.value))}
+            className={`bg-transparent outline-none ${delayValue != 0 ? 'text-white' : ''}`}
+          >
+            <option value={0}>No</option>
+            <option value={1}>Yes</option>
+            <option value={2}>Absent</option>
+          </select>
         </div>
       );
     },
   },
   {
-    accessorKey: "absent",
+    accessorKey: "Absent",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Absent" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
+      const absentValue = row.getValue("Absent");
+      const logId = row.original.id; // Assuming each log has a unique `id` field
+  
+      // Function to update absence
+      const updateAbsence = async (newAbsenceValue) => {
+        try {
+          const response = await fetch(`/api/logs/${logId}/absence`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ absent: newAbsenceValue }),
+          });
+  
+          if (!response.ok) {
+            throw new Error("Failed to update absence");
+          }
+  
+          // Handle success (e.g., refresh the table or show a notification)
+          console.log("Absence updated successfully");
+        } catch (error) {
+          console.error("Error updating absence:", error);
+        }
+      };
+  
       return (
-        <div className={`flex items-center justify-center gap-2 rounded-lg ${row.getValue("absent") == true ? 'bg-red-500 text-white' : ''}`}>
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className={`max-w-[500px] truncate font-medium ${row.getValue("absent") == true ? 'bg-red-500' : ''}`}>
-            {row.getValue("absent") }
-          </span>
+        <div className={`flex items-center justify-center gap-2 rounded-lg ${absentValue ? 'bg-red-500 text-white' : ''}`}>
+          <select
+            value={absentValue ? "true" : "false"} // Convert boolean to string for the dropdown
+            onChange={(e) => updateAbsence(e.target.value === "true")} // Convert string back to boolean
+            className={`bg-transparent outline-none ${absentValue ? 'text-white' : ''}`}
+          >
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
         </div>
       );
     },
@@ -206,7 +261,7 @@ export const columns = [
     },
   },
   {
-    accessorKey: "total_hours_delay",
+    accessorKey: "total_minutes_delay",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Total Minutes Delay" />
     ),
@@ -214,16 +269,16 @@ export const columns = [
       const label = labels.find((label) => label.value === row.original.label);
 
       return (
-        <div className={`flex items-center justify-center gap-2 ${row.getValue("total_hours_delay") != 0 ? 'text-red-500' : ''}`}>
+        <div className={`flex items-center justify-center gap-2 ${row.getValue("total_minutes_delay") != 0 ? 'text-red-500' : ''}`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("total_hours_delay") }
+            {row.getValue("total_minutes_delay") || "Null"}
           </span>
         </div>
       );
     },
   },
-  
+
   // {
   //   accessorKey: "priority",
   //   header: ({ column }) => (

@@ -42,7 +42,7 @@ import { InputGroup, InputGroupText } from "@/components/ui/input-group";
 import { users, columns } from "./data";
 import { formatDate, formatTime, formatTimeTo12Hour } from "@/lib/utils";
 
-const FixedHeader = ({ shifts, setShifts }) => {
+const FixedHeader = ({ schedules, setSchedules }) => {
 
   const [loading, setLoading] = useState(true);
 
@@ -50,10 +50,12 @@ const FixedHeader = ({ shifts, setShifts }) => {
     const fetchDepartments = async () => {
       setLoading(true); // Set loading to true before fetching
       try {
-        const response = await fetch('/api/shifts');
+        const response = await fetch('/api/schedules');
         const data = await response.json();
-        setShifts(data);
+        console.log(data)
+        setSchedules(data);
       } catch (error) {
+        setSchedules([])
         console.error('Error fetching shift:', error);
       } finally {
         setLoading(false); // Set loading to false after fetching
@@ -63,28 +65,35 @@ const FixedHeader = ({ shifts, setShifts }) => {
     fetchDepartments();
   }, []);
 
-  const onDelete = async (shift) => {
+
+
+  const onDelete = async (schedule) => {
     try {
-      const response = await fetch('/api/shifts', {
+      const response = await fetch(`/api/schedules`, { // Ensure the correct endpoint is used
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ shift_id: shift.shift_id }), // Send employee ID to delete
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduleId: schedule.schedule_id }), // Include scheduleId in the request body
       });
+
       if (!response.ok) {
-        throw new Error('Failed to delete shift');
+        throw new Error("Failed to delete schedule.");
       }
-      toast({
-        title: 'shift deleted successfully!',
-        color: "success"
-      }); // Success toast
-      setShifts((prevShifts) =>
-        prevShifts.filter(shiftElem => shiftElem.shift_id !== shift.shift_id) // Remove deleted employee from state
+
+      setSchedules((prevSchedules) =>
+        prevSchedules.filter(elmnt => elmnt.schedule_id !== schedule.schedule_id) // Update state to remove the deleted schedule
       );
+      toast({
+        title: "Success",
+        description: "Schedule deleted successfully.",
+        color: "success",
+      });
     } catch (error) {
-      console.error('Error deleting department:', error);
-      toast({ title: "Error", description: 'Error deleting department: ' + error.message, color: "destructive" }); // Error toast
+      console.error('Error deleting schedule:', error);
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while deleting the schedule.",
+        color: "destructive",
+      });
     }
   }
 
@@ -109,7 +118,7 @@ const FixedHeader = ({ shifts, setShifts }) => {
               <Icon icon="eos-icons:loading" className="w-8 h-8 animate-spin mx-auto" />
             </TableCell>
           </TableRow>
-        ) : shifts.length === 0 ? (
+        ) : schedules.length === 0 ? (
           <TableRow>
             <TableCell colSpan={columns.length} className="text-center py-8">
               <div className="flex flex-col items-center">
@@ -119,18 +128,18 @@ const FixedHeader = ({ shifts, setShifts }) => {
             </TableCell>
           </TableRow>
         ) : (
-          shifts.map((shift) => (
-            <TableRow key={shift.shift_id} className="hover:bg-slate-400 hover:bg-opacity-20 hover:cursor-pointer animate-slideDownAndFade">
+          (schedules || []).map((shift) => (
+            <TableRow key={shift.schedule_id} className="hover:bg-slate-400 hover:bg-opacity-20 hover:cursor-pointer animate-slideDownAndFade">
 
-              <TableCell>{shift.shift_id}</TableCell>
-              <TableCell>{shift.shift_name}</TableCell>
-              <TableCell>{formatTimeTo12Hour(shift.start_time)}</TableCell>
-              <TableCell>{formatTimeTo12Hour(shift.end_time)}</TableCell>
+              <TableCell>{shift.schedule_id}</TableCell>
+              <TableCell>{shift.user_name}</TableCell>
               <TableCell>{shift.department_name}</TableCell>
-              <TableCell>{`${formatDate(shift.shift_created_at)} : ${formatTime(shift.shift_created_at)}`}</TableCell>
+              <TableCell>{formatTimeTo12Hour(shift.start_time || '')} - {formatTimeTo12Hour(shift.end_time || '')}</TableCell>
+              <TableCell>{shift.phone_number}</TableCell>
+              <TableCell>{`${formatDate(shift.created_at)} : ${formatTime(shift.created_at)}`}</TableCell>
               <TableCell className="flex justify-end">
                 <div className="flex gap-3">
-                  <EditingDialog shiftElem={shift} setShifts={setShifts} />
+                  <EditingDialog shiftElem={shift} setSchedules={setSchedules} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -176,7 +185,7 @@ const FixedHeader = ({ shifts, setShifts }) => {
 export default FixedHeader;
 
 
-const EditingDialog = ({ shiftElem, setShifts }) => {
+const EditingDialog = ({ shiftElem, setSchedules }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -231,7 +240,7 @@ const EditingDialog = ({ shiftElem, setShifts }) => {
     }
 
     try {
-      const response = await fetch('/api/shifts', {
+      const response = await fetch('/api/schedules', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -248,8 +257,8 @@ const EditingDialog = ({ shiftElem, setShifts }) => {
 
       const newShift = await response.json();
 
-      // Update the shifts state in the parent component
-      setShifts(prevShifts =>
+      // Update the schedules state in the parent component
+      setSchedules(prevShifts =>
         prevShifts.map(shift =>
           shift.shift_id === shiftElem.shift_id ? newShift.shift : shift
         )

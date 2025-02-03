@@ -109,7 +109,7 @@ const ReportsArea = ({ analyticsData }) => {
     },
     {
       id: 4,
-      name: "Number of Employees Completed 8H",
+      name: "Number of Employees Completed Their Shift",
       count: analyticsData?.completedNotCompleted.completed || 0,
       hasRate: false,
       rate: "30",
@@ -119,7 +119,7 @@ const ReportsArea = ({ analyticsData }) => {
     },
     {
       id: 5,
-      name: "Number of Employees Not Completed 8H",
+      name: "Number of Employees Not Completed Their Shift",
       count: analyticsData?.completedNotCompleted.not_completed || 0,
       hasRate: false,
       rate: "30",

@@ -70,7 +70,7 @@ export async function POST(request) {
 
         const [rows] = await connection.execute(`
             SELECT
-                e.index,
+               
                 e.user_id,
                 e.user_name,
                 e.phone_number,
@@ -86,11 +86,13 @@ export async function POST(request) {
             [addUserResult.data.user_id]
         );
 
-        await connection.end();
-
+        
         return NextResponse.json({ message: 'User added successfully', user: rows[0] }, { status: 201 });
     } catch (error) {
         console.error('Error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    } finally {
+        await connection.end();
+
     }
 }

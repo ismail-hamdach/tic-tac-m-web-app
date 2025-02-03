@@ -26,9 +26,9 @@ export function DataTableToolbar({ table, dateControl, departments }) {
       <DatePickerWithRange dateControl = {dateControl} className={"rounded-xl border-2 text-"}/>
 
 
-      {table.getColumn("department") && (
+      {table.getColumn("department_name") && (
         <DataTableFacetedFilter
-          column={table.getColumn("department")}
+          column={table.getColumn("department_name")}
           title="Department"
           options={departments}
         />

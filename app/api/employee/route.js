@@ -13,7 +13,7 @@ export async function GET() {
     // Execute the query to fetch all users with their departments
     const [rows] = await connection.execute(`
         SELECT
-            e.index,
+            
             e.user_id,
             e.user_name,
             e.phone_number,
