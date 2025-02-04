@@ -91,8 +91,5 @@ export async function POST(request) {
     } catch (error) {
         console.error('Error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-    } finally {
-        await connection.end();
-
-    }
+    } 
 }

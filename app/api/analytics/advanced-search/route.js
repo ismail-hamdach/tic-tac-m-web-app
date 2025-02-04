@@ -11,13 +11,17 @@ export async function POST(req) {
     const connection = await mysql.createConnection(dbConfig);
 
     const { start_time, end_time } = await req.json()
+    const start_date = new Date(start_time).toISOString().split('T')[0]
+    const end_date = new Date(end_time).toISOString().split('T')[0]
+    console.log(start_date)
+    console.log(end_date)
 
     const [rows] = await connection.execute(
     `
         WITH RECURSIVE DateRange AS (
             -- Anchor member: Start with the initial date (x)
             SELECT 
-                ? AS date -- Replace '2023-10-01' with your start date (x)
+                '${start_date}' AS date -- Replace '2023-10-01' with your start date (x)
             UNION ALL
             -- Recursive member: Add 1 day to the previous date
             SELECT 
@@ -25,7 +29,7 @@ export async function POST(req) {
             FROM 
                 DateRange
             WHERE 
-                date < ? -- Replace '2023-10-31' with your end date (y)
+                date < '${end_date}' -- Replace '2023-10-31' with your end date (y)
         ),
         EmployeeDates AS (
             -- Cross join the generated dates with the employees table
@@ -85,11 +89,10 @@ export async function POST(req) {
             departments d 
             ON d.id = sh.departement_id
         WHERE 
-            ed.date BETWEEN ? AND ?
+            ed.date BETWEEN '${start_date}' AND '${end_date}'
         ORDER BY 
             ed.user_id, ed.date;
-    `,
-        [start_time, end_time, start_time, end_time]
+    `
     );
 
 

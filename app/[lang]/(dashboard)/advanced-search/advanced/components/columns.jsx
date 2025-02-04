@@ -127,7 +127,7 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("check_in") || "Null"}
+            {row.getValue("check_in") != null ? `${formatDate(row.getValue("check_in"))} - ${formatTime(row.getValue("check_in"))}` : "Null"}
           </span>
         </div>
       );
@@ -145,7 +145,7 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("check_out") || 'Null'}
+            {row.getValue("check_out") != null ? `${formatDate(row.getValue("check_out"))} - ${formatTime(row.getValue("check_out"))}` : 'Null'}
           </span>
         </div>
       );
@@ -272,7 +272,7 @@ export const columns = [
         <div className={`flex items-center justify-center gap-2 ${row.getValue("total_minutes_delay") != 0 ? 'text-red-500' : ''}`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("total_minutes_delay") || "Null"}
+            {row.getValue("total_minutes_delay") || "None"}
           </span>
         </div>
       );
