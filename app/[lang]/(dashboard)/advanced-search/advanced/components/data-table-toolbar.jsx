@@ -16,9 +16,9 @@ export function DataTableToolbar({ table, dateControl, departments }) {
     <div className="flex flex-1 flex-wrap items-center gap-2">
       <Input
         placeholder="Name ..."
-        value={table.getColumn("name")?.getFilterValue() ?? ""}
+        value={table.getColumn("user_name")?.getFilterValue() ?? ""}
         onChange={(event) =>
-          table.getColumn("name")?.setFilterValue(event.target.value)
+          table.getColumn("user_name")?.setFilterValue(event.target.value)
         }
         className="h-8 min-w-[200px] max-w-sm"
       />
