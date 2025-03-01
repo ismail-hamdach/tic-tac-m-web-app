@@ -51,6 +51,7 @@
     "cmdk": "^0.2.0",
     "date-fns": "^3.3.1",
     "embla-carousel-react": "^8.0.0-rc17",
+    "file-saver": "^2.0.5",
     "framer-motion": "^10.16.3",
     "lucide-react": "^0.269.0",
     "mysql2": "^3.11.0",
@@ -77,6 +78,7 @@
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.6",
     "vaul": "^0.8.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8",
     "zustand": "^4.4.1"
   },
