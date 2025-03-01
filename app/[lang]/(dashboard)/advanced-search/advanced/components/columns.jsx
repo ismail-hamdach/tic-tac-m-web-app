@@ -266,13 +266,15 @@ export const columns = [
       <DataTableColumnHeader column={column} title="Total Minutes Delay" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
+      const totalMinutesDelay = row.getValue("total_minutes_delay");
+      const hours = Math.floor(totalMinutesDelay / 60);
+      const minutes = totalMinutesDelay % 60;
 
       return (
-        <div className={`flex items-center justify-center gap-2 ${row.getValue("total_minutes_delay") != 0 ? 'text-red-500' : ''}`}>
+        <div className={`flex items-center justify-center gap-2 ${totalMinutesDelay != 0 ? 'text-red-500' : ''}`}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className={`max-w-[500px] truncate font-medium`}>
-            {row.getValue("total_minutes_delay") || "None"}
+            {totalMinutesDelay ? `${hours}H:${minutes}M` : "None"}
           </span>
         </div>
       );
