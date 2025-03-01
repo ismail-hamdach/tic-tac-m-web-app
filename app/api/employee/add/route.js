@@ -16,9 +16,9 @@ export async function POST(request) {
         if (!phoneNumber || typeof phoneNumber !== 'string' || !/^\d{10}$/.test(phoneNumber)) {
             return NextResponse.json({ error: 'Invalid phoneNumber' }, { status: 400 });
         }
-        if (!ip_address || typeof ip_address !== 'string' || !/^(\d{1,3}\.){3}\d{1,3}$/.test(ip_address)) {
-            return NextResponse.json({ error: 'Invalid ip address' }, { status: 400 });
-        }
+        // if (!ip_address || typeof ip_address !== 'string' || !/^(\d{1,3}\.){3}\d{1,3}$/.test(ip_address)) {
+        //     return NextResponse.json({ error: 'Invalid ip address' }, { status: 400 });
+        // }
         if (!port || typeof port !== 'number' || port < 1 || port > 65535) {
             return NextResponse.json({ error: 'Invalid port' }, { status: 400 });
         }
